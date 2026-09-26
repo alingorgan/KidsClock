@@ -19,7 +19,22 @@ Do not guess these in code. Ask the owner, or make them configurable and log the
 12. Ranking of media: the place (sink) vs the object (toothbrush) vs a self-recording.
 
 ## Engineering
-13. **Screen pinning / kiosk lock.** Android screen pinning versus a true lock-task or device-owner kiosk. Needs an early spike on a real device to see how much of the "child cannot leave the app" goal is achievable without special setup.
-14. Battery and heat with the screen always on, and overnight charging behaviour.
-15. Sound: volume control, quiet hours, silent mode and audio focus behaviour.
+13. ~~**Screen pinning / kiosk lock.**~~ Spiked on a real device (Moto G14, Android 14):
+    `docs/spikes/01-kiosk-screen-pinning.md`. Screen pinning (no device-owner) blocks Home,
+    Recents, Back and the notification shade, and the app can cleanly self-unpin via
+    `stopLockTask()`. Requires the OS's "App pinning" setting to be turned on first (off by
+    default) — a setup-flow step, not something the app can enable silently. Still open: whether
+    the OS's swipe-and-hold unpin gesture is discoverable/triggerable by a toddler by accident
+    (needs a hands-on test with a real child, not adb) — the app-side gate does not depend on this
+    either way, since it drives its own unpin.
+14. Battery and heat with the screen always on, and overnight charging behaviour. Spiked:
+    `docs/spikes/04-battery-heat.md`. 30 minutes screen-on while charging showed no heat buildup
+    (31.6°C → 28.1°C) and charged normally. Still open: unplugged screen-on drain rate wasn't
+    measured (the test device happened to be on the charger throughout) — needs a short follow-up
+    run off the charger.
+15. Sound: volume control, quiet hours, silent mode and audio focus behaviour. Spiked:
+    `docs/spikes/03-audio-focus.md`. Confirmed the chime (played on `STREAM_MUSIC`) is unaffected
+    by ringer silent/vibrate mode on this device. Still open: behaviour under Do Not Disturb
+    "Total silence" (couldn't be toggled from adb on this device/build) and ducking behaviour
+    against another app already holding audio focus — both need a manual on-device check.
 16. Accessibility: TalkBack labels, reduced motion, contrast on the traffic colours.

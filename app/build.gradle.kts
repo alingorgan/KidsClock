@@ -17,6 +17,7 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:platform"))
     implementation(project(":feature:run:impl"))
     implementation(libs.androidx.activity.compose)
 }

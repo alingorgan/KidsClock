@@ -20,6 +20,9 @@ Confidence: **solid** = supported by evidence found; **plausible** = reasonable 
 | 14 | Carry-along phone, locked to the app. | A child moves between rooms; the display must travel. Screen time is acceptable because the screen provides real value. | decision |
 | 15 | Quick timer for ad-hoc time (5/10/15 more minutes, or a new preset). | Real life has moments with no routine (playground). | decision |
 | 16 | Act on pointer release, no text selection. | In the prototype a drag that began on text silently cancelled taps. | solid (observed bug) |
+| 17 | Kiosk: screen pinning (`startLockTask`, no device-owner), self-unpinned by the app via `stopLockTask()` behind the grown-up gesture. | Real-device spike (Moto G14, Android 14, `docs/spikes/01-kiosk-screen-pinning.md`): blocks Home/Recents/Back/shade; app can exit cleanly without teaching the caregiver an OS gesture. Requires "App pinning" to be turned on in Settings first (off by default) — needs a setup-flow step. | solid (device-tested), pending toddler hands-on check |
+| 18 | Boot id for the run anchor = `Settings.Global.BOOT_COUNT`. | Real-device spike confirmed it increments exactly once per reboot, needs no permission, and correctly drove the wall-clock fallback across a real reboot (`docs/spikes/02-timekeeping.md`). | solid |
+| 19 | Chime plays on `STREAM_MUSIC`, unaffected by ringer silent/vibrate mode. | Confirmed via `dumpsys audio`: `STREAM_MUSIC` is not in the ringer-mode-affected stream group on the test device (`docs/spikes/03-audio-focus.md`). Behaviour under Do Not Disturb "Total silence" is still open. | solid |
 
 ## Things the prototype does that the app should NOT copy
 See the list in `CLAUDE.md`. In particular, the prototype counts time in 100 ms ticks and starts the demo 20% in.
