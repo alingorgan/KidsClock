@@ -1,0 +1,10 @@
+# Smoke flow: the app launches and shows the run screen. Run with:
+#   maestro test .maestro/smoke.yaml
+# See docs/UI_AUTOMATION.md for setup and the id convention (`<screen>.<element>`).
+appId: com.kidsclock
+---
+- launchApp
+- assertVisible:
+    id: "run.screen"
+- assertVisible:
+    id: "run.title"

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Git pre-commit: ktlint, guardrails, lint and tests for modules with staged changes. Enable once per clone:
+#   git config core.hooksPath .githooks
+git diff --cached --name-only --diff-filter=ACMR | "$(git rev-parse --show-toplevel)/scripts/check-changed.sh"

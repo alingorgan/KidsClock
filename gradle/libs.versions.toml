@@ -1,0 +1,47 @@
+[versions]
+agp = "9.4.1"
+kotlin = "2.4.20"
+composeBom = "2026.06.01"
+activityCompose = "1.13.0"
+junit = "6.1.3"
+mockk = "1.14.11"
+roborazzi = "1.75.0"
+robolectric = "4.17"
+androidxTestExt = "1.3.0"
+androidxTestRunner = "1.7.0"
+androidxTestRules = "1.7.0"
+espresso = "3.7.0"
+uiautomator = "2.4.0"
+ktlintPlugin = "14.2.0"
+
+[libraries]
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
+roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExt" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
+androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+
+# build-logic compile-only
+android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+roborazzi-gradlePlugin = { module = "io.github.takahirom.roborazzi:io.github.takahirom.roborazzi.gradle.plugin", version.ref = "roborazzi" }
+ktlint-gradlePlugin = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlintPlugin" }

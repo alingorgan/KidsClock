@@ -1,0 +1,590 @@
+<title>Now and Next</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#e4e9ee; --surface:#ffffff; --ink:#18222c; --ink2:#55636f; --rule:#d6dde4;
+  --stage:#f6f8fa; --bezel:#1a232b; --accent:#1f6f8b; --accent-ink:#ffffff; --focus:#d9591f;
+  --f-kid:'Fredoka','Nunito','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'DM Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1116; --surface:#17212a; --ink:#e8eef2; --ink2:#a0afba; --rule:#2a3a46;
+  --stage:#141c23; --bezel:#05080b; --accent:#6cc0dc; --accent-ink:#0e151b; --focus:#f08653;}}
+:root[data-theme="dark"]{
+  --bg:#0b1116; --surface:#17212a; --ink:#e8eef2; --ink2:#a0afba; --rule:#2a3a46;
+  --stage:#141c23; --bezel:#05080b; --accent:#6cc0dc; --accent-ink:#0e151b; --focus:#f08653;}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:20px 40px}
+button,select{font:inherit;color:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.page{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:28px;justify-content:center;align-items:flex-start}
+
+/* ---------- device ---------- */
+.phone{position:relative;width:100%;max-width:392px;height:min(780px,calc(100vh - 40px));min-height:600px;flex:none;
+  border:9px solid var(--bezel);border-radius:44px;overflow:hidden;background:var(--surface);isolation:isolate}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+
+/* ---------- setup ---------- */
+#setup{background:var(--surface)}
+.shead{padding:26px 20px 12px;display:flex;flex-direction:column;gap:12px}
+.shead h1{font-family:var(--f-kid);font-weight:600;font-size:1.6rem;margin:0;line-height:1.1}
+.shead p{margin:0;color:var(--ink2);font-size:.88rem}
+.seg{display:flex;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:transparent;padding:8px 10px;cursor:pointer;font-weight:500;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.slist{flex:none;padding:0 20px}
+#setup{overflow-y:auto}
+.prefs{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
+.prefs label.chk{flex-direction:row;align-items:center;gap:8px}
+.arow{display:flex;flex-direction:column;gap:10px;padding-block:14px;border-top:1px solid var(--rule)}
+.ahead{display:flex;align-items:center;gap:10px}
+.ahead b{flex:1;font-weight:600}
+.dot{width:30px;height:30px;border-radius:50%;background:var(--pc);display:grid;place-items:center;flex:none}
+.dot svg{width:18px;height:18px}
+.step{display:flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:.8rem}
+.step button{width:26px;height:26px;border-radius:8px;border:1px solid var(--rule);background:var(--surface);cursor:pointer;line-height:1}
+.step span{min-width:42px;text-align:center}
+.amedia{display:flex;gap:8px;flex-wrap:wrap}
+.mbtn{display:flex;align-items:center;gap:8px;border:1px dashed var(--ink2);background:transparent;border-radius:10px;padding:6px 10px;cursor:pointer;font-size:.85rem}
+.mbtn.has{border-style:solid;border-color:var(--rule)}
+.mbtn img{width:26px;height:26px;border-radius:50%;object-fit:cover}
+.mbtn .tri{width:26px;height:26px;border-radius:50%;background:var(--pc);display:grid;place-items:center}
+.mbtn:disabled{opacity:.35;cursor:default}
+.x{border:0;background:transparent;color:var(--ink2);cursor:pointer;font-size:.8rem;text-decoration:underline;padding:6px 4px}
+.apol{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--ink2)}
+select{border:1px solid var(--rule);background:var(--surface);border-radius:10px;padding:7px 10px;font-size:.88rem}
+.sfoot{position:sticky;bottom:0;margin-top:auto;padding:12px 20px 20px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--rule);background:var(--surface)}
+.btn{border:1px solid var(--rule);background:var(--surface);border-radius:12px;padding:11px 14px;cursor:pointer;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:1.02rem}
+.btn:hover{border-color:var(--ink2)}
+.btn[disabled]{opacity:.4;cursor:default}
+.note{font-size:.76rem;color:var(--ink2)}
+.quick{display:flex;flex-direction:column;gap:8px}
+.quick .r3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.qnew,.qs{display:flex;gap:8px}
+.qnew select,.qs select{flex:1;min-width:0}
+.qs{align-items:stretch}
+.quick .sub{margin:0;font-size:.8rem;color:var(--ink2)}
+
+/* ---------- run ---------- */
+#run{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;--c:#D98214;background:color-mix(in srgb,var(--c) 11%,var(--stage));align-items:center;justify-content:center;gap:20px;padding:56px 16px 110px;transition:background 1.4s}
+.strip{position:absolute;top:18px;left:56px;right:16px;display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.pip{width:22px;height:22px;border-radius:50%;background:var(--pc);opacity:.28;display:grid;place-items:center;transition:opacity .6s,transform .6s}
+.pip svg{width:13px;height:13px}
+.pip.now{opacity:1;transform:scale(1.2);box-shadow:0 0 0 2px var(--stage),0 0 0 4px var(--pc)}
+.pip.done{opacity:.12}
+.gate{position:absolute;top:8px;left:8px;width:44px;height:44px;border:0;background:transparent;border-radius:50%;cursor:pointer;display:grid;place-items:center;padding:0;-webkit-user-select:none;user-select:none;touch-action:none}
+.gate i{width:16px;height:16px;border-radius:50%;background:#5B5BF0;border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+.gate svg{position:absolute;inset:4px;width:36px;height:36px;transform:rotate(-90deg)}
+.gate circle{fill:none;stroke:var(--ink);stroke-width:3;stroke-dasharray:88;stroke-dashoffset:88;opacity:0}
+.gate.needed i{animation:nudge 1.6s ease-in-out infinite;background:#F0782B}
+@keyframes nudge{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+.gate.hold circle{opacity:.8;animation:fillring 1.2s linear forwards}
+@keyframes fillring{to{stroke-dashoffset:0}}
+
+.orb{position:relative;width:min(72vw,300px);aspect-ratio:1;display:grid;place-items:center;flex:none}
+.time{position:absolute;inset:0;border-radius:50%;background:color-mix(in srgb,var(--c) 24%,transparent);transform:scale(var(--s,1));transition:transform .25s linear,background 1.4s}
+.core{position:relative;width:46%;aspect-ratio:1;border-radius:50%;background:var(--c);display:grid;place-items:center;border:0;padding:0;cursor:pointer;transition:background 1.4s,box-shadow .25s linear;overflow:visible;box-shadow:0 0 0 4px var(--c)}
+.core svg.ic{width:62%;height:62%}
+.core img{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover}
+.core .badge{position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.core .badge svg{width:12px;height:12px;margin-left:2px}
+#run.winding .core{animation:breathe 3.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.bgmode .word,.bgmode .next .cap small,.bgmode .hint{color:var(--ink)}
+.word{font-family:var(--f-kid);font-weight:600;font-size:2.3rem;color:color-mix(in srgb,var(--c) 70%,var(--ink));line-height:1.1;text-align:center;margin:0}
+
+.next{position:absolute;right:14px;bottom:14px;display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:6px;border-radius:99px;opacity:.5;transition:opacity .8s,transform .8s;transform-origin:right bottom;--n:#3E9A62}
+.next .bub{width:56px;height:56px;border-radius:50%;background:var(--n);display:grid;place-items:center;flex:none}
+.next .bub svg{width:60%;height:60%}
+.next .cap{display:flex;flex-direction:column;text-align:right;font-family:var(--f-kid);line-height:1.15}
+.next .cap small{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.next .cap b{font-weight:500;font-size:1.05rem}
+.next.go{opacity:1;transform:scale(1.25)}
+.next.go.tappable{cursor:pointer}
+.next.go.tappable .bub{animation:ring 2.4s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--n) 55%,transparent)}100%{box-shadow:0 0 0 20px transparent}}
+.hint{pointer-events:none;text-align:center;max-width:260px;min-height:2.5em;font-family:var(--f-kid);color:var(--ink2);font-size:.98rem;line-height:1.25}
+
+/* zoom */
+.zoom{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 30%,rgba(0,0,0,.35));opacity:0;transition:opacity .4s;padding:18px}
+.zoom{pointer-events:none}
+.zoom.on{opacity:1;pointer-events:auto}
+[hidden]{display:none!important}
+.zbox{width:100%;max-width:340px;aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--c);transform:scale(.3);transition:transform .5s cubic-bezier(.2,.9,.3,1),border-radius .5s;cursor:pointer;position:relative;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.zoom.on .zbox{transform:scale(1);border-radius:32px}
+.zbox img,.zbox video,.zbox canvas{width:100%;height:100%;object-fit:cover;display:block}
+.zx{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#fff;font-family:var(--f-kid);opacity:.85;font-size:.95rem}
+
+/* sheet */
+.scrim{position:absolute;inset:0;z-index:8;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:9;background:var(--surface);border-radius:22px 22px 0 0;padding:18px 18px 22px;display:flex;flex-direction:column;gap:14px;transform:translateY(105%);transition:transform .3s ease;max-height:86%;overflow-y:auto}
+.sheet.on{transform:none}
+.sheet h2{margin:0;font-family:var(--f-mono);font-weight:500;font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2)}
+.say{display:flex;flex-direction:column;gap:4px}
+.say p{margin:0;font-size:1rem}
+.say .ask{color:var(--ink2);font-size:.88rem}
+.say .left{font-family:var(--f-mono);font-size:.75rem;color:var(--ink2)}
+.srow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.srow .btn{padding:10px 8px;font-size:.9rem}
+
+/* side notes */
+.side{flex:1;min-width:250px;max-width:400px;display:flex;flex-direction:column;gap:18px;padding-top:6px}
+.side h2{margin:0;font-family:var(--f-mono);font-weight:500;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2)}
+.side p,.side li{color:var(--ink2);font-size:.9rem;margin:0}
+.side ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.side label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--ink2)}
+.side .row{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:440px){.phone{border-width:0;border-radius:0;height:calc(100vh - 20px)}}
+@media (prefers-reduced-motion:reduce){#run.winding .core,.next.go.tappable .bub{animation:none}.time,#run,.core,.zbox,.zoom,.sheet{transition:none}}
+</style>
+
+<div class="page">
+
+<div class="phone" id="phone">
+  <!-- SETUP -->
+  <section class="screen" id="setup" aria-label="Caregiver setup">
+    <div class="shead">
+      <h1>Set up the evening</h1>
+      <p>Choose the child's age, then add a photo or clip for each activity. Everything stays on this device.</p>
+      <div class="seg" role="group" aria-label="Child's age">
+        <button type="button" id="ageYoung" aria-pressed="false">Under 3</button>
+        <button type="button" id="ageOlder" aria-pressed="true">3 and over</button>
+      </div>
+      <p id="ageNote"></p>
+      <div class="prefs">
+        <label class="apol">Progress colour
+          <select id="tlMode"><option value="screen">Whole screen</option><option value="ring">Ring around the picture</option><option value="off">Activity colour only</option></select></label>
+        <label class="apol">When time is up
+          <select id="sndMode"><option value="chime">Gentle chime</option><option value="repeat">Chime, repeats every 20 s</option><option value="off">No sound</option></select></label>
+        <label class="apol chk"><input type="checkbox" id="sndWarn" checked> Soft note when nearly done</label>
+        <button class="btn" id="sndTry" type="button">Play the sounds</button>
+      </div>
+    </div>
+    <div class="slist" id="slist"></div>
+    <div class="sfoot">
+      <div class="qs"><select id="qActS" aria-label="Quick timer activity"></select><select id="qMinS" aria-label="Quick timer minutes"></select><button class="btn" id="qGoS" type="button">Quick timer</button></div>
+      <p class="note">No routine needed, for example at the playground.</p>
+      <button class="btn primary" id="btnStart" type="button">Start routine</button>
+      <p class="note">Sample pictures are placeholders. Pick your own and they replace them.</p>
+    </div>
+  </section>
+
+  <!-- RUN -->
+  <section class="screen" id="run" aria-label="Child display" hidden>
+    <button class="gate" id="gate" type="button" aria-label="Grown-up controls: press and hold"><i></i>
+      <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14"/></svg></button>
+    <div class="strip" id="strip"></div>
+    <div class="orb"><div class="time" id="time"></div><button class="core" id="core" type="button" aria-label="Look closer"></button></div>
+    <p class="word" id="word" aria-live="polite"></p>
+    <button class="next" id="next" type="button" hidden>
+      <span class="cap"><small>Next</small><b id="nextWord"></b></span>
+      <span class="bub" id="nextBub"></span>
+    </button>
+    <div class="hint" id="hint"></div>
+
+    <div class="zoom" id="zoom" hidden><div class="zbox" id="zbox"></div><div class="zx">Tap to close</div></div>
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet" id="sheet" role="dialog" aria-label="Grown-up controls">
+      <div class="say"><h2>Say together</h2><p id="sayNow"></p><p class="ask" id="sayAsk"></p><span class="left" id="left"></span></div>
+      <div class="srow">
+        <button class="btn" id="bPause" type="button">Pause</button>
+        <button class="btn" id="bPeek" type="button">Show what's next</button>
+        <button class="btn" id="bArm" type="button">Let child start next</button>
+        <button class="btn primary" id="bSkip" type="button">Start next</button>
+        <button class="btn" id="bRestart" type="button">Restart</button>
+        <button class="btn" id="bSetup" type="button">Back to setup</button>
+      </div>
+      <div class="quick" id="quick">
+        <h2>Quick timer</h2>
+        <p class="sub">More time on this activity, then the routine carries on.</p>
+        <div class="r3"><button class="btn qmore" type="button" data-m="5">5 more min</button><button class="btn qmore" type="button" data-m="10">10 more min</button><button class="btn qmore" type="button" data-m="15">15 more min</button></div>
+        <p class="sub">Or start something else now.</p>
+        <div class="qnew"><select id="qAct" aria-label="Activity"></select><select id="qMin" aria-label="Minutes"></select><button class="btn" id="qGo" type="button">Start</button></div>
+      </div>
+      <button class="btn" id="bClose" type="button">Close</button>
+    </div>
+  </section>
+</div>
+
+<aside class="side">
+  <div>
+    <h2>What to try</h2>
+    <ul>
+      <li>Tap the circle in the middle. With a photo or clip it opens up, plays, then closes by itself.</li>
+      <li>Press and hold the small dot in the top-left for about a second to open the grown-up sheet.</li>
+      <li>Let the timer run out. Bath time waits for the grown-up to unlock it; story time can only be started from the sheet.</li>
+      <li>Switch to "Under 3" in setup: only line pictures, and "next" stays hidden until the grown-up shows it.</li>
+      <li>In setup, compare progress colours (whole screen, ring, none) and the end sound. Sound starts after your first tap.</li>
+      <li>Quick timer: press and hold the dot, then choose "5 more min" for the same activity, or start something new like Playground. In setup, "Quick timer" runs one with no routine.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>Demo helpers</h2>
+    <div class="row">
+      <button class="btn" id="dEnd" type="button">Jump near the end</button>
+      <button class="btn" id="dArm" type="button">Grown-up: unlock next</button>
+    </div>
+    <label style="margin-top:10px">Speed
+      <select id="speed"><option value="1">Real time</option><option value="20" selected>Demo · 20× faster</option><option value="60">Demo · 60× faster</option></select>
+    </label>
+  </div>
+  <p>Web stand-in for the native app. The real app would run full screen, lock to this view, keep media only on the device, and put the grown-up gesture behind something a toddler won't stumble on.</p>
+</aside>
+
+</div>
+
+<input type="file" id="fPhoto" accept="image/*" hidden>
+<input type="file" id="fClip" accept="video/*" hidden>
+
+<script>
+(function(){
+  var ICON={
+    play:'<rect x="14" y="58" width="32" height="30" rx="5" fill="#fff"/><rect x="54" y="58" width="32" height="30" rx="5" fill="#fff"/><rect x="34" y="24" width="32" height="30" rx="5" fill="#fff" transform="rotate(-8 50 39)"/>',
+    tidy:'<path d="M14 50h72l-7 38H21z" fill="#fff"/><rect x="38" y="16" width="24" height="24" rx="5" fill="#fff"/><path d="M14 50h72" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/>',
+    bath:'<path d="M10 52h80v8a24 24 0 0 1-24 24H34A24 24 0 0 1 10 60z" fill="#fff"/><circle cx="32" cy="34" r="9" fill="none" stroke="#fff" stroke-width="6"/><circle cx="56" cy="24" r="6" fill="none" stroke="#fff" stroke-width="5"/><circle cx="72" cy="38" r="5" fill="none" stroke="#fff" stroke-width="5"/>',
+    teeth:'<g transform="rotate(-38 50 50)"><rect x="8" y="42" width="56" height="16" rx="8" fill="#fff"/><rect x="58" y="30" width="34" height="40" rx="7" fill="#fff"/><path d="M68 38v24M76 38v24M84 38v24" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/></g>',
+    story:'<path d="M50 30C38 21 22 21 10 26v50c12-5 28-5 40 4 12-9 28-9 40-4V26c-12-5-28-5-40 4z" fill="#fff"/><path d="M50 30v50" stroke="var(--c)" stroke-width="4"/>',
+    swing:'<path d="M16 90L30 16h40l14 74" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M42 18v44M58 18v44" stroke="#fff" stroke-width="4"/><rect x="34" y="62" width="32" height="10" rx="5" fill="#fff"/>',
+    snack:'<path d="M50 32c-14-10-34-2-32 22 2 20 16 34 32 30 16 4 30-10 32-30 2-24-18-32-32-22z" fill="#fff"/><path d="M50 32c0-10 4-18 12-22" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/>',
+    sun:'<circle cx="50" cy="50" r="20" fill="#fff"/><g stroke="#fff" stroke-width="7" stroke-linecap="round"><path d="M50 10v10M50 80v10M10 50h10M80 50h10M22 22l7 7M71 71l7 7M78 22l-7 7M29 71l-7 7"/></g>',
+    done:'<path d="M22 54l20 20 38-44" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>',
+    sleep:'<path d="M60 12a38 38 0 1 0 28 62A32 32 0 0 1 60 12z" fill="#fff"/><circle cx="78" cy="30" r="5" fill="#fff"/><circle cx="90" cy="50" r="3.5" fill="#fff"/>'
+  };
+  var svg=function(k,cls){return '<svg'+(cls?' class="'+cls+'"':'')+' viewBox="0 0 100 100" aria-hidden="true">'+ICON[k]+'</svg>'};
+  var POL={tap:'Child taps',unlock:'Grown-up unlocks, child taps',adult:'Grown-up only'};
+
+  var R=[
+    {k:'play', label:'Playtime',   ing:'playing',        mins:8,  c:'#D98214',pol:'tap'},
+    {k:'tidy', label:'Tidy up',    ing:'tidying up',     mins:3,  c:'#3E9A62',pol:'tap'},
+    {k:'bath', label:'Bath time',  ing:'having a bath',  mins:10, c:'#2F86CC',pol:'unlock'},
+    {k:'teeth',label:'Brush teeth',ing:'brushing teeth', mins:3,  c:'#1E9C96',pol:'tap'},
+    {k:'story',label:'Story time', ing:'reading a story',mins:8,  c:'#8462C2',pol:'adult'},
+    {k:'sleep',label:'Sleep time', ing:'getting ready to sleep',mins:0,c:'#33448A',pol:'adult',final:true,finalWord:'Goodnight',finalSay:'The day is done. Time for sleep.',finalAsk:'Ask: "What was your favourite part of today?"'}
+  ];
+  var S={idx:0,el:0,phase:'active',running:true,age:'older',speed:20,peek:false,chimed:false,armed:false,setup:true,saved:null,solo:false,tl:'screen',sound:'chime',warn:true,sndTimer:null};
+  var $=function(id){return document.getElementById(id)};
+
+  /* placeholder media so the flow can be seen */
+  function samplePhoto(r){
+    var c=document.createElement('canvas');c.width=c.height=400;var g=c.getContext('2d');
+    var gr=g.createRadialGradient(200,170,20,200,200,300);gr.addColorStop(0,'#fff');gr.addColorStop(1,r.c);
+    g.fillStyle=gr;g.fillRect(0,0,400,400);
+    g.fillStyle='rgba(0,0,0,.55)';g.textAlign='center';g.font='600 46px sans-serif';g.fillText(r.label,200,205);
+    g.font='500 22px sans-serif';g.fillText('SAMPLE PHOTO',200,250);
+    return c.toDataURL('image/jpeg',.8);
+  }
+  R.forEach(function(r){if(!r.final){r.photo=samplePhoto(r);r.photoSample=true}});
+  R[0].clip='sample';R[2].clip='sample';
+
+  function dur(i){return R[i].mins*60}
+  function progress(){var d=dur(S.idx);return d?Math.min(1,S.el/d):1}
+  function older(){return S.age==='older'}
+  var STOPS=[[0,[38,182,96]],[.3,[38,182,96]],[.65,[240,180,30]],[1,[224,44,36]]];
+  function tlColour(p){
+    for(var i=1;i<STOPS.length;i++){
+      if(p<=STOPS[i][0]){
+        var a=STOPS[i-1],b=STOPS[i],t=(p-a[0])/(b[0]-a[0]);
+        return 'rgb('+[0,1,2].map(function(k){return Math.round(a[1][k]+(b[1][k]-a[1][k])*t)}).join(',')+')';
+      }
+    }
+    return 'rgb(224,44,36)';
+  }
+  function tlName(p){return p<.4?'green':(p<.9?'yellow':'red')}
+  function paint(){
+    var a=R[S.idx],p=progress(),m=S.tl;
+    run.classList.toggle('bgmode',m==='screen'&&!a.final);
+    if(a.final||m==='off'){time.style.background='';core.style.boxShadow='';run.style.background='';return}
+    var col=tlColour(p);
+    if(m==='screen'){
+      var s1=Math.round(34+24*p),s2=Math.round(56+38*p);
+      run.style.background='radial-gradient(circle at 50% 42%,color-mix(in srgb,'+col+' '+s1+'%,var(--stage)) 0%,color-mix(in srgb,'+col+' '+s2+'%,var(--stage)) 100%)';
+      time.style.background='color-mix(in srgb,#fff 42%,transparent)';
+      core.style.boxShadow='0 0 0 4px var(--c)';
+    }else{
+      run.style.background='';
+      time.style.background='color-mix(in srgb,'+col+' 38%,transparent)';
+      core.style.boxShadow='0 0 0 4px var(--c),0 0 0 13px '+col;
+    }
+  }
+  var PRE=[
+    {key:'playground',label:'Playground',ing:'at the playground',k:'swing',c:'#C2468B'},
+    {key:'outside',label:'Outside time',ing:'playing outside',k:'sun',c:'#2E9BB3'},
+    {key:'free',label:'Free play',ing:'playing freely',k:'play',c:'#D98214'},
+    {key:'snack',label:'Snack time',ing:'having a snack',k:'snack',c:'#A8742F'}
+  ];
+  function mkAct(key,mins){var q=PRE.filter(function(x){return x.key===key})[0];return {k:q.k,label:q.label,ing:q.ing,mins:mins,c:q.c,pol:'adult',adhoc:true}}
+  function cleanAdhoc(){if(S.solo)return;for(var i=R.length-1;i>=0;i--)if(R[i].adhoc)R.splice(i,1)}
+  function leaveSolo(){if(S.solo&&S.saved){R.splice.apply(R,[0,R.length].concat(S.saved))}S.saved=null;S.solo=false}
+  function reset(){cleanAdhoc();S.idx=0;S.el=S.solo?0:dur(0)*.2;S.phase='active';S.running=true;S.peek=false;S.chimed=false;S.armed=false;stopSound()}
+  reset();
+
+  /* ---------- setup screen ---------- */
+  function renderSetup(){
+    var ol=older();
+    $('tlMode').value=S.tl;$('sndMode').value=S.sound;$('sndWarn').checked=S.warn;
+    $('ageYoung').setAttribute('aria-pressed',String(!ol));
+    $('ageOlder').setAttribute('aria-pressed',String(ol));
+    $('ageNote').textContent=ol?'Photos and clips are shown in the circle. Tapping it opens them up.':'Under 3 the circle shows a simple picture. Photos and clips are kept for later.';
+    $('slist').innerHTML=R.map(function(r,i){
+      var step=r.final?'<span class="step"><span>bedtime</span></span>':
+        '<span class="step"><button type="button" data-a="min" data-i="'+i+'" data-d="-1" aria-label="Fewer minutes for '+r.label+'">−</button><span>'+r.mins+' min</span><button type="button" data-a="min" data-i="'+i+'" data-d="1" aria-label="More minutes for '+r.label+'">+</button></span>';
+      var media='';
+      if(!r.final){
+        var dis=ol?'':' disabled';
+        media='<div class="amedia">'+
+          '<button type="button" class="mbtn'+(r.photo?' has':'')+'" data-a="photo" data-i="'+i+'"'+dis+'>'+(r.photo?'<img alt="" src="'+r.photo+'">':'')+(r.photo?'Replace photo':'Add photo')+'</button>'+
+          '<button type="button" class="mbtn'+(r.clip?' has':'')+'" data-a="clip" data-i="'+i+'"'+dis+'>'+(r.clip?'<span class="tri" style="--pc:'+r.c+'"><svg viewBox="0 0 10 10" width="10" height="10"><path d="M2 1l7 4-7 4z" fill="#fff"/></svg></span>':'')+(r.clip?'Replace clip':'Add clip')+'</button>'+
+          ((r.photo||r.clip)?'<button type="button" class="x" data-a="rm" data-i="'+i+'"'+dis+'>Remove</button>':'')+
+        '</div>';
+      }
+      var pol=i===0?'<span class="note">Begins when you press Start.</span>':
+        '<label class="apol">Starting this activity<select data-a="pol" data-i="'+i+'">'+Object.keys(POL).map(function(k){return '<option value="'+k+'"'+(r.pol===k?' selected':'')+'>'+POL[k]+'</option>'}).join('')+'</select></label>';
+      return '<div class="arow"><div class="ahead"><span class="dot" style="--pc:'+r.c+'--x">'+'</span><b>'+r.label+'</b>'+step+'</div>'+media+pol+'</div>';
+    }).join('');
+    // fix dot: build separately to keep svg colour tokens
+    var dots=$('slist').querySelectorAll('.dot');
+    R.forEach(function(r,i){dots[i].style.background=r.c;dots[i].innerHTML=svg(r.k).replace('<svg','<svg style="--c:'+r.c+'"')});
+  }
+  var pickI=0;
+  $('slist').addEventListener('click',function(e){
+    var b=e.target.closest('[data-a]');if(!b)return;
+    var i=+b.dataset.i,a=b.dataset.a;
+    if(a==='min'){R[i].mins=Math.min(30,Math.max(1,R[i].mins+ +b.dataset.d));renderSetup()}
+    else if(a==='photo'){pickI=i;$('fPhoto').click()}
+    else if(a==='clip'){pickI=i;$('fClip').click()}
+    else if(a==='rm'){R[i].photo=null;R[i].clip=null;renderSetup()}
+  });
+  $('slist').addEventListener('change',function(e){
+    if(e.target.dataset.a==='pol'){R[+e.target.dataset.i].pol=e.target.value}
+  });
+  $('fPhoto').onchange=function(e){var f=e.target.files[0];if(!f)return;R[pickI].photo=URL.createObjectURL(f);R[pickI].photoSample=false;e.target.value='';renderSetup()};
+  $('fClip').onchange=function(e){var f=e.target.files[0];if(!f)return;R[pickI].clip=URL.createObjectURL(f);e.target.value='';renderSetup()};
+  $('ageYoung').onclick=function(){S.age='young';renderSetup()};
+  $('ageOlder').onclick=function(){S.age='older';renderSetup()};
+  $('tlMode').onchange=function(e){S.tl=e.target.value};
+  $('sndMode').onchange=function(e){S.sound=e.target.value};
+  $('sndWarn').onchange=function(e){S.warn=e.target.checked};
+  $('sndTry').onclick=function(){ensureAudio();tone('warn');setTimeout(function(){tone('end')},1200)};
+  $('btnStart').onclick=function(){reset();S.setup=false;ensureAudio();show()};
+
+  function show(){
+    $('setup').hidden=!S.setup;$('run').hidden=S.setup;
+    if(S.setup){stopSound();leaveSolo();cleanAdhoc();renderSetup()}else{closeSheet();closeZoom(true);render()}
+  }
+
+  /* ---------- sound ---------- */
+  var actx=null;
+  function ensureAudio(){
+    try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}catch(e){}
+  }
+  function bell(f,t0,vol,len){
+    [[1,1],[2.01,.22]].forEach(function(h){
+      var o=actx.createOscillator(),g=actx.createGain();
+      o.type='sine';o.frequency.value=f*h[0];o.connect(g);g.connect(actx.destination);
+      g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol*h[1],t0+.03);g.gain.exponentialRampToValueAtTime(.0001,t0+len);
+      o.start(t0);o.stop(t0+len+.05);
+    });
+  }
+  function tone(kind){
+    if(!actx)return;
+    var t=actx.currentTime+.02;
+    if(kind==='warn'){bell(523.25,t,.12,1.6)}
+    else{[523.25,659.25,783.99,1046.5].forEach(function(f,i){bell(f,t+i*.28,.16,2.2)})}
+  }
+  function stopSound(){clearInterval(S.sndTimer);S.sndTimer=null}
+  function endSound(){
+    stopSound();
+    if(S.sound==='off')return;
+    tone('end');
+    if(S.sound==='repeat')S.sndTimer=setInterval(function(){if(S.phase==='transition'&&!S.setup)tone('end');else stopSound()},20000);
+  }
+
+  /* ---------- run screen ---------- */
+  var run=$('run'),core=$('core'),time=$('time'),next=$('next');
+  function canChildStart(){
+    var n=R[S.idx+1];if(!n||S.phase!=='transition')return false;
+    return n.pol==='tap'||(n.pol==='unlock'&&S.armed);
+  }
+  function advance(){
+    if(S.idx>=R.length-1)return;
+    closeZoom(true);
+    stopSound();
+    S.idx++;S.el=0;S.peek=false;S.chimed=false;S.armed=false;
+    S.phase=R[S.idx].final?'final':'active';
+    render();
+  }
+  function render(){
+    if(S.setup)return;
+    var a=R[S.idx],n=R[S.idx+1],p=progress(),ol=older();
+    run.style.setProperty('--c',a.c);
+    var hasPhoto=ol&&a.photo&&!a.final,hasClip=ol&&a.clip&&!a.final;
+    core.innerHTML=hasPhoto?('<img alt="" src="'+a.photo+'">'+(hasClip?'<span class="badge"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="'+a.c+'"/></svg></span>':'')):svg(a.k,'ic');
+    core.setAttribute('aria-label',hasPhoto?'Look closer at '+a.label:a.label);
+    $('word').textContent=S.phase==='final'?(a.finalWord||'Goodnight'):a.label;
+    time.style.visibility=a.final?'hidden':'visible';
+    time.style.setProperty('--s',a.final?.46:(.46+.54*(1-p)));
+    paint();
+    run.classList.toggle('winding',(p>.85&&S.phase==='active')||S.phase==='transition');
+
+    var show=!!n&&(ol||S.peek||S.phase==='transition');
+    next.hidden=!show;
+    if(n){
+      next.style.setProperty('--n',n.c);
+      $('nextBub').innerHTML=svg(n.k);
+      $('nextWord').textContent=n.label;
+    }
+    var go=S.phase==='transition';
+    next.classList.toggle('go',go);
+    next.classList.toggle('tappable',canChildStart());
+    var h='';
+    if(go)h=canChildStart()?'All done! Tap what comes next.':'All done! Your grown-up will help.';
+    $('hint').textContent=h;
+    $('gate').classList.toggle('needed',go&&!canChildStart());
+
+    $('strip').innerHTML=ol?R.map(function(r,i){
+      return '<span class="pip'+(i===S.idx?' now':'')+(i<S.idx?' done':'')+'" style="--pc:'+r.c+'">'+svg(r.k).replace('<svg','<svg style="--c:'+r.c+'"')+'</span>';
+    }).join(''):'';
+
+    // sheet
+    updateSay();
+    $('sayAsk').textContent=S.phase==='transition'?'Ask: "Can you show me what is next?"':(S.phase==='final'?(a.finalAsk||'Ask: "What was your favourite part of today?"'):'Ask: "Is the circle big or small now? What comes after this?"');
+    updateLeft();
+    $('bPause').textContent=S.running?'Pause':'Resume';
+    $('bPeek').hidden=ol||!n||S.phase==='transition';
+    $('bPeek').textContent=S.peek?"Hide what's next":"Show what's next";
+    var needArm=n&&n.pol==='unlock'&&S.phase==='transition';
+    $('bArm').hidden=!needArm;
+    $('bArm').textContent=S.armed?'Child can start next':'Let child start next';
+    $('bSkip').disabled=!n;
+    $('bSkip').textContent=n?(n.final&&n.k==='done'?'Finish':'Start '+n.label.toLowerCase()):'Last activity';
+    $('quick').hidden=!!a.final;
+  }
+  function updateSay(){
+    var a=R[S.idx],n=R[S.idx+1],p=progress();
+    var now=S.phase==='final'?(a.finalSay||'The day is done. Time for sleep.'):'We are '+a.ing+'.';
+    var tail='';
+    if(S.phase==='active'&&n)tail=' The big circle is getting smaller'+(S.tl!=='off'?' and the '+(S.tl==='screen'?'screen':'ring')+' is '+tlName(p)+'. When it is red, we are out of time.':'. When it is small, '+n.label.toLowerCase()+' comes next.');
+    if(S.phase==='transition')tail=(S.tl!=='off'?' It is red. We are out of time.':' The circle is all gone.')+' Now it is '+n.label.toLowerCase()+'.';
+    $('sayNow').textContent=now+tail;
+  }
+  function updateLeft(){
+    var a=R[S.idx],rem=Math.max(0,dur(S.idx)-S.el);
+    $('left').textContent=a.final?'':(S.phase==='transition'?'Time is up':'About '+Math.ceil(rem/60)+' min left (grown-up only)');
+  }
+  setInterval(function(){
+    if(S.setup||!S.running||S.phase!=='active')return;
+    S.el+=.1*S.speed;
+    var p=progress();
+    if(p>=1){S.phase='transition';endSound();render();return}
+    if(p>=.85&&!S.chimed){S.chimed=true;if(S.warn&&S.sound!=='off')tone('warn');render();return}
+    time.style.setProperty('--s',.46+.54*(1-p));
+    paint();updateSay();updateLeft();
+  },100);
+
+  /* ---------- zoom (photo / clip) ---------- */
+  var zTimer=null,zAnim=null;
+  function closeZoom(instant){
+    clearTimeout(zTimer);cancelAnimationFrame(zAnim);
+    var z=$('zoom');if(z.hidden)return;
+    z.classList.remove('on');
+    var done=function(){z.hidden=true;$('zbox').innerHTML=''};
+    if(instant)done();else setTimeout(done,450);
+  }
+  function openZoom(){
+    var a=R[S.idx];if(!older()||a.final||!a.photo)return;
+    var box=$('zbox');
+    if(a.clip&&a.clip!=='sample'){
+      box.innerHTML='<video playsinline autoplay src="'+a.clip+'"></video>';
+      var v=box.firstChild;v.onended=function(){closeZoom()};v.play&&v.play().catch(function(){});
+      zTimer=setTimeout(closeZoom,60000);
+    }else if(a.clip==='sample'){
+      box.innerHTML='<canvas width="400" height="400"></canvas>';
+      var cv=box.firstChild,g=cv.getContext('2d'),t0=performance.now();
+      (function draw(now){
+        var t=(now-t0)/1000;
+        g.fillStyle=a.c;g.fillRect(0,0,400,400);
+        g.fillStyle='rgba(255,255,255,.9)';
+        g.beginPath();g.arc(200+Math.sin(t*3)*90,200+Math.cos(t*2)*40,44,0,7);g.fill();
+        g.fillStyle='#fff';g.textAlign='center';g.font='600 30px sans-serif';g.fillText('SAMPLE CLIP',200,340);
+        zAnim=requestAnimationFrame(draw);
+      })(t0);
+      zTimer=setTimeout(closeZoom,4500);
+    }else{
+      box.innerHTML='<img alt="" src="'+a.photo+'">';
+      zTimer=setTimeout(closeZoom,6000);
+    }
+    var z=$('zoom');z.hidden=false;void z.offsetWidth;z.classList.add('on');
+  }
+  core.addEventListener('pointerup',function(e){e.preventDefault();openZoom()});
+  core.addEventListener('click',function(e){if(e.detail===0)openZoom()});
+  $('zoom').addEventListener('pointerup',function(){closeZoom()});
+
+  /* ---------- child's next tap ---------- */
+  /* act on release, not click: a drag that started on text (or a stray selection) must not swallow the tap */
+  function onTap(el,fn){
+    el.addEventListener('pointerup',function(e){e.preventDefault();fn()});
+    el.addEventListener('click',function(e){if(e.detail===0)fn()}); // keyboard activation
+  }
+  onTap(next,function(){if(canChildStart())advance()});
+  /* early or locked taps: say why instead of doing nothing */
+  $('run').addEventListener('pointerdown',function(e){
+    if(!e.target.closest('#next')||canChildStart())return;
+    var h=$('hint');
+    h.textContent=S.phase==='transition'?'Your grown-up will help with this one.':'Not yet. Watch the circle get small.';
+    clearTimeout(h._t);h._t=setTimeout(render,2500);
+  });
+
+  /* ---------- grown-up gate ---------- */
+  var gate=$('gate'),gT=null;
+  function holdStart(e){e.preventDefault();gate.classList.add('hold');clearTimeout(gT);gT=setTimeout(function(){gate.classList.remove('hold');openSheet()},1200)}
+  function holdEnd(){clearTimeout(gT);gate.classList.remove('hold')}
+  gate.addEventListener('pointerdown',holdStart);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(t){gate.addEventListener(t,holdEnd)});
+  gate.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openSheet()}});
+  function openSheet(){stopSound();$('sheet').classList.add('on');$('scrim').classList.add('on');render()}
+  function closeSheet(){$('sheet').classList.remove('on');$('scrim').classList.remove('on')}
+  $('scrim').onclick=closeSheet;$('bClose').onclick=closeSheet;
+  $('bPause').onclick=function(){S.running=!S.running;render()};
+  $('bPeek').onclick=function(){S.peek=!S.peek;render()};
+  $('bArm').onclick=function(){S.armed=!S.armed;render()};
+  $('bSkip').onclick=function(){advance();closeSheet()};
+  $('bRestart').onclick=function(){reset();render();closeSheet()};
+  $('bSetup').onclick=function(){S.setup=true;show()};
+
+  /* ---------- quick timer ---------- */
+  function fillQuick(actSel,minSel){
+    actSel.innerHTML=PRE.map(function(q){return '<option value="'+q.key+'">'+q.label+'</option>'}).join('');
+    minSel.innerHTML=[5,10,15,20,30].map(function(m){return '<option value="'+m+'">'+m+' min</option>'}).join('');
+  }
+  fillQuick($('qAct'),$('qMin'));fillQuick($('qActS'),$('qMinS'));
+  function startExtra(mins,act){
+    var cur=R[S.idx];
+    var a=act||{k:cur.k,label:cur.label,ing:cur.ing,c:cur.c,photo:cur.photo,clip:cur.clip,pol:'adult',adhoc:true};
+    a.mins=mins;a.adhoc=true;
+    closeZoom(true);stopSound();
+    R.splice(S.idx+1,0,a);
+    S.idx++;S.el=0;S.phase='active';S.peek=false;S.chimed=false;S.armed=false;S.running=true;
+    closeSheet();render();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.qmore'),function(b){b.onclick=function(){startExtra(+b.dataset.m)}});
+  $('qGo').onclick=function(){startExtra(+$('qMin').value,mkAct($('qAct').value,+$('qMin').value))};
+  $('qGoS').onclick=function(){
+    leaveSolo();S.saved=R.slice();
+    var a=mkAct($('qActS').value,+$('qMinS').value);
+    var done={k:'done',label:'All done',ing:'all done',mins:0,c:'#3E9A62',pol:'tap',final:true,finalWord:'All done!',finalSay:'That is all for now. Well done!',finalAsk:'Ask: "What was the best bit?"'};
+    R.splice(0,R.length,a,done);S.solo=true;
+    S.idx=0;S.el=0;S.phase='active';S.running=true;S.peek=false;S.chimed=false;S.armed=false;
+    S.setup=false;ensureAudio();show();
+  };
+
+  /* ---------- demo helpers ---------- */
+  $('dEnd').onclick=function(){if(S.setup||S.phase!=='active')return;S.el=Math.max(S.el,dur(S.idx)-5);render()};
+  $('dArm').onclick=function(){var n=R[S.idx+1];if(S.setup||!n||S.phase!=='transition'||n.pol!=='unlock')return;S.armed=true;render()};
+  $('speed').onchange=function(e){S.speed=+e.target.value};
+
+  show();
+})();
+</script>

@@ -1,0 +1,25 @@
+# Decisions and why
+
+Confidence: **solid** = supported by evidence found; **plausible** = reasonable inference; **hypothesis** = untested, must be checked with real children. Almost everything about 2–4-year-olds specifically is at most *plausible*, because the literature on typical toddlers is thin.
+
+| # | Decision | Why | Confidence |
+|---|---|---|---|
+| 1 | Do not teach clock time to this age group. Show *now / how much left / next*. | Conventional clock time has little influence on children under about 5; words like "in a minute" are not understood. | solid |
+| 2 | Short horizon: current activity plus at most one "next". | Foresight is weak at 3 and spurts around 3½–4; delays over about 5 minutes are hard for 3-year-olds. | plausible |
+| 3 | Show time left as **area that shrinks** (progress bubble), not numbers. | Duration knowledge does not transfer across contexts before about 4; magnitude-style representations are earlier than positional ones. | plausible |
+| 4 | Caregiver and child use it **together**, caregiver in control. | Caregiver co-viewing closes much of the toddler "video deficit"; the display is a shared object for conversation. | plausible |
+| 5 | Under 3: line pictogram. 3 and over: photo (and clip). | Photos are recognised far more reliably than line drawings; toddlers under about 2.5 often do not treat pictures as information about the real world, and this improves in the third year. Owner's daughter (just over 3) already understands video. | solid / plausible |
+| 6 | Personalise: own toothbrush, the place, or a recording. | Closer match to the real thing. Ranking (place, then object, then self-recording) is a guess to test. | hypothesis |
+| 7 | Video is optional and short, opened by tap, not autoplay. | Video self-modelling has moderate support in preschoolers (mostly special-education studies); motion competes with the time cue. | plausible |
+| 8 | Media stays on the device. | Photos and video of a child. Also a selling point. | decision |
+| 9 | Traffic-light colour, on the **whole screen** (radial gradient, stronger at the edges). | Glanceable from across a room. A ring or outline was tried and judged too weak a signal. Red = stop / green = go is learnable at 3 (evidence is preschool guides, weak). Red did not reliably distort time in the studies found. | hypothesis |
+| 10 | Colour is never the only cue. | Red-green colour deficiency is roughly 4% of boys globally and 2.6–7.6% in US boys. Shape shrinks and the sound backs it up. | solid |
+| 11 | Sound is a **gentle chime**, optionally repeating, not an alarm. | Arousal and emotion distort children's duration judgements. Harsh sounds risk startle or dread. Owner wanted something that gets attention without looking. | plausible |
+| 12 | Handover is **grown-up controlled**, with a per-activity policy (child taps / unlock first / grown-up only). | Owner's requirement: caregiver decides who may start the next activity, and the child should not be able to skip. | decision |
+| 13 | Grown-up gesture: press-and-hold a distinct dot top-left. | Stops stray toddler taps. Deliberately visible to the caregiver. Placeholder; may become a two-finger hold or pattern. | hypothesis |
+| 14 | Carry-along phone, locked to the app. | A child moves between rooms; the display must travel. Screen time is acceptable because the screen provides real value. | decision |
+| 15 | Quick timer for ad-hoc time (5/10/15 more minutes, or a new preset). | Real life has moments with no routine (playground). | decision |
+| 16 | Act on pointer release, no text selection. | In the prototype a drag that began on text silently cancelled taps. | solid (observed bug) |
+
+## Things the prototype does that the app should NOT copy
+See the list in `CLAUDE.md`. In particular, the prototype counts time in 100 ms ticks and starts the demo 20% in.

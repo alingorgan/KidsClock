@@ -1,0 +1,194 @@
+<title>Time Intel</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f2f5f5; --surface:#ffffff; --ink:#14232b; --ink2:#43555e; --rule:#d5dede;
+  --sun:#d9591f; --strong:#1b7a6e; --mixed:#b07a0c; --spec:#6a5a9c;
+  --bar:#cfe0de; --bar-ink:#1b7a6e;
+  --f-display:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1a20; --surface:#16252d; --ink:#e6eeee; --ink2:#a3b5b8; --rule:#2a3d46;
+  --sun:#f08653; --strong:#54c2b1; --mixed:#e0aa3e; --spec:#a898de;
+  --bar:#22383f; --bar-ink:#54c2b1;}}
+:root[data-theme="dark"]{
+  --bg:#0f1a20; --surface:#16252d; --ink:#e6eeee; --ink2:#a3b5b8; --rule:#2a3d46;
+  --sun:#f08653; --strong:#54c2b1; --mixed:#e0aa3e; --spec:#a898de;
+  --bar:#22383f; --bar-ink:#54c2b1;}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:32px 72px}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(2.4rem,7vw,3.8rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.7rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.1rem;font-weight:500}
+p{margin:0;max-width:65ch}
+a{color:var(--strong)}
+a:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2)}
+.lede{font-size:1.15rem;color:var(--ink2);margin-top:16px}
+.head{display:flex;flex-direction:column;gap:12px}
+.sec{display:flex;flex-direction:column;gap:20px}
+.sec>header{display:flex;flex-direction:column;gap:8px}
+.tag{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap;align-self:flex-start}
+.t-strong{color:var(--strong)}.t-mixed{color:var(--mixed)}.t-spec{color:var(--spec)}
+.finding{display:grid;grid-template-columns:1fr;gap:6px;padding-block:16px;border-top:1px solid var(--rule)}
+.finding:last-child{border-bottom:1px solid var(--rule)}
+.finding .row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.finding p{color:var(--ink2)}
+.finding .src{font-family:var(--f-mono);font-size:.78rem}
+.verdict{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.verdict strong{font-family:var(--f-display);font-size:1.1rem}
+/* age chart */
+.chart{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:20px;overflow-x:auto}
+.chart-in{min-width:560px;display:flex;flex-direction:column;gap:10px}
+.axis,.lane{display:grid;grid-template-columns:190px 1fr;gap:14px;align-items:center}
+.ticks{position:relative;height:20px;border-bottom:1px solid var(--rule)}
+.ticks span{position:absolute;transform:translateX(-50%);font-family:var(--f-mono);font-size:.7rem;color:var(--ink2);top:0}
+.lane .lbl{font-size:.82rem;line-height:1.3}
+.track{position:relative;height:18px;background:
+  repeating-linear-gradient(90deg,transparent 0,transparent calc(100%/12 - 1px),var(--rule) calc(100%/12 - 1px),var(--rule) calc(100%/12))}
+.bar{position:absolute;top:2px;bottom:2px;border-radius:4px;background:var(--bar-ink);opacity:.9}
+.bar.soft{background:var(--bar-ink);opacity:.35}
+.mark{position:absolute;top:-2px;width:3px;height:22px;background:var(--sun);border-radius:2px}
+.legend{font-size:.8rem;color:var(--ink2);display:flex;flex-wrap:wrap;gap:6px 18px}
+.legend i{display:inline-block;width:14px;height:8px;border-radius:3px;margin-right:6px;background:var(--bar-ink)}
+.legend i.s{opacity:.35}.legend i.m{width:3px;height:12px;background:var(--sun);vertical-align:-2px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.two>div{border-top:2px solid var(--ink);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.two p{color:var(--ink2);font-size:.95rem}
+ol.src-list{padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.9rem;margin:0}
+.note{font-size:.88rem;color:var(--ink2);border-left:3px solid var(--sun);padding-left:14px}
+@media (max-width:520px){.axis,.lane{grid-template-columns:130px 1fr}}
+</style>
+
+<div class="wrap">
+
+<div class="head">
+  <span class="eyebrow">KidsClock · Phase 0 · Research intel · 19 Sep 2026</span>
+  <h1>How children come to feel, read and use time</h1>
+  <p class="lede">A first pass through the developmental and neuroscience literature, sorted from what the brain senses, to what children can do at each age, to how time attaches to activities. It ends with design hypotheses, not decisions.</p>
+  <p class="note">Method: web searches across five topics, working from abstracts and summaries, not full papers. Treat each line as a lead to verify before we build on it. Confidence tags mark how well-established a claim looks, not how important it is.</p>
+</div>
+
+<section class="sec">
+  <header><span class="eyebrow">The short version</span><h2>Five things worth building on</h2></header>
+  <div class="two">
+    <div><h3>Time starts as events, not numbers</h3><p>Toddlers place things in time by their position in a routine (after breakfast, before bath). Event-independent time, and later clock time, is built on top.</p></div>
+    <div><h3>The felt sense is real but noisy</h3><p>Even 3-year-olds time durations, with error that scales with the interval. Attention and emotion bend it, especially in young children.</p></div>
+    <div><h3>The clock is a hard, learned code</h3><p>Reading analogue time takes roughly three years of schooling and depends on culture and teaching, not on maturity alone.</p></div>
+    <div><h3>Time-as-space is acquired</h3><p>Left-to-right timelines emerge around age 5–6 and follow writing direction. It is a cultural habit, not a given.</p></div>
+    <div><h3>Visual, shrinking time helps some kids</h3><p>Early evidence links visual timers to less anticipatory anxiety and better on-task behaviour. It is small and specific.</p></div>
+  </div>
+</section>
+
+<section class="sec">
+  <header><span class="eyebrow">Layer 1 · Perception</span><h2>What the brain does with time</h2>
+  <p>Timing from milliseconds to a few seconds runs through basal ganglia, cerebellum and cortical circuits. Longer spans and time of day rely on other systems.</p></header>
+
+  <div class="finding"><div class="row"><h3>Interval timing is distributed across the brain</h3><span class="tag t-strong">Strong</span></div>
+  <p>The striatal beat frequency model has the striatum detecting patterns across cortical oscillations. The cerebellum contributes to temporal prediction and discrete, interval-based timing. The two are reciprocally connected.</p>
+  <span class="src">Reviews: <a href="https://www.annualreviews.org/content/journals/10.1146/annurev-neuro-062012-170349">Annual Reviews of Neuroscience</a> · <a href="https://www.nature.com/articles/npp2010113">Neuropsychopharmacology</a></span></div>
+
+  <div class="finding"><div class="row"><h3>Scalar property: error grows with the interval</h3><span class="tag t-strong">Strong</span></div>
+  <p>Variability in timing rises in proportion to duration (a Weber-law pattern). It holds in children at every age tested, and sensitivity improves from childhood through adolescence.</p>
+  <span class="src"><a href="https://doi.org/10.1080/02724980244000161">Droit-Volet 2002</a> · <a href="https://link.springer.com/article/10.1007/s12144-022-03526-9">Current Psychology 2022</a></span></div>
+
+  <div class="finding"><div class="row"><h3>Attention and emotion distort duration</h3><span class="tag t-strong">Strong</span></div>
+  <p>Children aged 3–8 judge angry faces as lasting longer than neutral ones. Secondary tasks shorten perceived duration more in children than in adults, in proportion to their attentional capacity.</p>
+  <span class="src"><a href="https://www.bps.org.uk/psychologist/children-and-time">BPS overview</a> · <a href="https://www.researchgate.net/publication/6453709_Anger_and_time_perception_in_children">Anger and time perception</a></span></div>
+
+  <div class="finding"><div class="row"><h3>Body clocks and time of day</h3><span class="tag t-spec">Not yet searched</span></div>
+  <p>Circadian rhythm is a separate biological system that plausibly anchors "slices of a day". I have not pulled literature on it yet. It is the next search.</p></div>
+</section>
+
+<section class="sec">
+  <header><span class="eyebrow">Layer 2 · Development</span><h2>What children can do, and roughly when</h2>
+  <p>Bars show where the cited studies place emergence and consolidation. Ages are approximate and vary by task, culture and teaching.</p></header>
+
+  <div class="chart" role="img" aria-label="Chart of developmental milestones for time understanding, by age 0 to 12 years">
+  <div class="chart-in">
+    <div class="axis"><span class="eyebrow">Age (years)</span>
+      <div class="ticks">
+        <span style="left:0%">0</span><span style="left:16.66%">2</span><span style="left:33.33%">4</span><span style="left:50%">6</span><span style="left:66.66%">8</span><span style="left:83.33%">10</span><span style="left:100%">12</span>
+      </div></div>
+    <div class="lane"><span class="lbl">Implicit sense of time (infants)</span><div class="track"><div class="bar soft" style="left:0%;width:25%"></div></div></div>
+    <div class="lane"><span class="lbl">Time tied to routine events</span><div class="track"><div class="bar" style="left:12.5%;width:29%"></div></div></div>
+    <div class="lane"><span class="lbl">Causal, event-independent time</span><div class="track"><div class="bar" style="left:33.33%;width:16.6%"></div></div></div>
+    <div class="lane"><span class="lbl">Durations generalise across contexts</span><div class="track"><div class="bar" style="left:33.33%;width:33.3%"></div></div></div>
+    <div class="lane"><span class="lbl">Left-to-right mental timeline</span><div class="track"><div class="bar" style="left:41.6%;width:16.7%"></div></div></div>
+    <div class="lane"><span class="lbl">Learning to read clocks (K–grade 2)</span><div class="track"><div class="bar" style="left:41.6%;width:25%"></div></div></div>
+    <div class="lane"><span class="lbl">Adult-like timing profile</span><div class="track"><div class="mark" style="left:66.6%"></div></div></div>
+    <div class="lane"><span class="lbl">Timing sensitivity keeps improving</span><div class="track"><div class="bar soft" style="left:66.6%;width:33.4%"></div></div></div>
+    <div class="legend"><span><i></i>Emerging / consolidating</span><span><i class="s"></i>Gradual or approximate</span><span><i class="m"></i>Point marker</span></div>
+  </div></div>
+
+  <div class="finding"><div class="row"><h3>Early time is event-bound</h3><span class="tag t-strong">Strong</span></div>
+  <p>Young children locate events by their place in an ordered, repeating sequence of familiar events. Independent locations in time, and past/present/future judgements, come later, tied to causal understanding at around 4–6. This is the base for calendars and clocks.</p>
+  <span class="src"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6290033/">Temporal concepts (PMC)</a> · <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4356002/">Events and children's sense of time</a></span></div>
+
+  <div class="finding"><div class="row"><h3>Before ~4, learned durations do not transfer</h3><span class="tag t-mixed">Mixed</span></div>
+  <p>Toddlers time durations in one setting but struggle to reuse that sense in new contexts. Rules of thumb like "5 minutes" therefore mean little to them.</p>
+  <span class="src"><a href="https://pubmed.ncbi.nlm.nih.gov/22999968/">Neurodevelopmental approach (PubMed)</a></span></div>
+
+  <div class="finding"><div class="row"><h3>Analogue reading is a multi-year skill</h3><span class="tag t-strong">Strong</span></div>
+  <p>Mastery generally spans kindergarten to grade 2. Common errors include reading the minute hand's number as hours (hand on the 2 read as "2 past"), and the drifting hour hand at half past. In one comparison, Chinese children learned clock reading about two years before Flemish peers, which points to exposure and teaching over maturation.</p>
+  <span class="src"><a href="https://link.springer.com/article/10.1007/BF03217308">Analogue vs digital strategies</a> · <a href="https://files.eric.ed.gov/fulltext/EJ1258500.pdf">Clock reading, grade 3</a></span></div>
+
+  <div class="finding"><div class="row"><h3>Clock difficulty may flag maths difficulty</h3><span class="tag t-mixed">Mixed</span></div>
+  <p>Trouble reading clocks early is described as a possible early sign of dyscalculia, though the link to general maths is weak while children are still learning whole and half hours.</p></div>
+</section>
+
+<section class="sec">
+  <header><span class="eyebrow">Layer 3 · Time and activity</span><h2>Slices of a day are anchored to what happens in them</h2></header>
+
+  <div class="finding"><div class="row"><h3>Routines are the first time structure</h3><span class="tag t-strong">Strong</span></div>
+  <p>Children first show they represent time through behaviour routines, alongside early language. That supports your premise directly: activity comes first and the abstract clock comes second.</p></div>
+
+  <div class="finding"><div class="row"><h3>Adult clock-time vs event-time is partly a cultural and self-regulation style</h3><span class="tag t-mixed">Mixed</span></div>
+  <p>People differ in whether they schedule by the clock or by when an activity finishes. This is evidence that the "clock" is one convention among several ways to organise a day. I have only seen the title of the key paper so far.</p>
+  <span class="src"><a href="https://www.researchgate.net/publication/251472777_Clock_time_vs_event_time_Temporal_culture_or_self-regulation">Clock time vs. event time</a></span></div>
+
+  <div class="finding"><div class="row"><h3>Shrinking visual timers reduce anxiety for some kids</h3><span class="tag t-mixed">Mixed</span></div>
+  <p>A study of 44 children found a visual timer lowered anticipatory anxiety and cut inattentive and motor-restless behaviour, most for children at higher ADHD risk. Only some children actually monitored it. Much of the wider claim set comes from practitioner sites, not trials.</p>
+  <span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12731990/">Time on Their Side (PMC)</a></span></div>
+</section>
+
+<section class="sec">
+  <header><span class="eyebrow">Layer 4 · Representation</span><h2>Analogue, digital, or neither?</h2></header>
+
+  <div class="verdict">
+    <strong>Is the round clock face inherited?</strong>
+    <p>I found no evidence for it. The nearest finding points the other way: spatial mappings of time are acquired. Left-to-right timelines appear from about 5–6, and direction follows writing and calendar orientation, reversing in other cultures. Children's <em>general</em> sense of magnitude may be innate, but position and direction are learned. So the analogue face's pull is better explained as cultural familiarity, which is still a real asset because parents and schools use it.</p>
+    <span class="src"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4489723/">Mental timeline emergence</a> · <a href="https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.01155/full">Timeline for duration, age 5</a> · <a href="https://onlinelibrary.wiley.com/doi/10.1111/cdev.13780">Tillman 2022</a></span>
+  </div>
+
+  <div class="finding"><div class="row"><h3>Digital is learned sooner, analogue teaches structure</h3><span class="tag t-mixed">Mixed</span></div>
+  <p>Digital times are generally easier in grades 1–3, and times past the hour are harder than on-the-hour. Analogue shows elapsed and remaining time as area, which digital cannot, but demands spatial and number-translation skills first.</p>
+  <span class="src"><a href="https://link.springer.com/chapter/10.1007/978-3-031-35681-0_27">Clock face vs digits</a></span></div>
+</section>
+
+<section class="sec">
+  <header><span class="eyebrow">What this suggests</span><h2>Hypotheses for the design phases</h2>
+  <p>These are inferences from the evidence above, not results. Each one is testable with children.</p></header>
+  <div class="two">
+    <div><h3>Start from the day, not the dial</h3><p>Build early phases around ordered routine events (a day as a sequence of activities), since that is where children already are.</p><span class="tag t-spec">Hypothesis</span></div>
+    <div><h3>Show remaining time as a shrinking quantity</h3><p>Use area or length rather than numerals early on, in line with magnitude-based, not position-based, time sense.</p><span class="tag t-spec">Hypothesis</span></div>
+    <div><h3>Bridge to the clock late and gradually</h3><p>Introduce the 12-hour circle after routine ordering and duration sense are secure, around 5–7. Handle the hour-hand drift and minute-number confusion explicitly.</p><span class="tag t-spec">Hypothesis</span></div>
+    <div><h3>Keep arousal low</h3><p>Because anxiety and attention bend perceived duration, avoid alarming countdown visuals.</p><span class="tag t-spec">Hypothesis</span></div>
+  </div>
+</section>
+
+<section class="sec">
+  <header><span class="eyebrow">Gaps and next searches</span><h2>What I have not covered</h2></header>
+  <ol class="src-list">
+    <li>Circadian and time-of-day perception in children, and sleep-linked routines.</li>
+    <li>Cross-cultural time systems that are not clock-based (for example, event-based or lunar-solar day reckoning).</li>
+    <li>Experimental evidence on non-clock displays for children: shrinking-area timers, sun-path or colour-band days.</li>
+    <li>Full-paper reads for the key claims, so the confidence tags rest on methods and sample sizes, not abstracts.</li>
+    <li>Design precedents: existing child clocks and routine apps, and what evidence they cite.</li>
+  </ol>
+</section>
+
+</div>

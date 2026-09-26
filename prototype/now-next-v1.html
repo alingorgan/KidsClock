@@ -1,0 +1,296 @@
+<title>Now and Next</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#eceff3; --surface:#ffffff; --ink:#18222c; --ink2:#55636f; --rule:#d6dde4;
+  --stage:#f6f8fa; --accent:#1f6f8b; --accent-ink:#ffffff; --focus:#d9591f;
+  --f-kid:'Fredoka','Nunito','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'DM Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e151b; --surface:#17212a; --ink:#e8eef2; --ink2:#a0afba; --rule:#2a3a46;
+  --stage:#141c23; --accent:#6cc0dc; --accent-ink:#0e151b; --focus:#f08653;}}
+:root[data-theme="dark"]{
+  --bg:#0e151b; --surface:#17212a; --ink:#e8eef2; --ink2:#a0afba; --rule:#2a3a46;
+  --stage:#141c23; --accent:#6cc0dc; --accent-ink:#0e151b; --focus:#f08653;}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.app{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+button,select{font:inherit;color:inherit}
+button:focus-visible,select:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* ---------- child stage ---------- */
+.stage{--c:#D98214;position:relative;overflow:hidden;border-radius:28px;
+  background:color-mix(in srgb,var(--c) 11%,var(--stage));
+  min-height:min(74vh,600px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:24px 20px 84px;
+  transition:background 1.4s ease}
+.strip{position:absolute;top:16px;left:0;right:0;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding-inline:16px}
+.strip[hidden]{display:none}
+.pip{width:26px;height:26px;border-radius:50%;background:var(--pc);opacity:.28;display:grid;place-items:center;transition:opacity .6s,transform .6s}
+.pip svg{width:16px;height:16px}
+.pip.now{opacity:1;transform:scale(1.25);box-shadow:0 0 0 3px var(--stage),0 0 0 5px var(--pc)}
+.pip.done{opacity:.12}
+
+.orb{position:relative;width:min(66vw,46vh,360px);aspect-ratio:1;display:grid;place-items:center}
+.time{position:absolute;inset:0;border-radius:50%;background:color-mix(in srgb,var(--c) 24%,transparent);
+  transform:scale(var(--s,1));transition:transform .25s linear,background 1.4s}
+.core{position:relative;width:46%;aspect-ratio:1;border-radius:50%;background:var(--c);display:grid;place-items:center;
+  transition:background 1.4s}
+.core svg{width:62%;height:62%;overflow:visible}
+.stage.winding .core{animation:breathe 3.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+.word{font-family:var(--f-kid);font-weight:600;font-size:clamp(2rem,7vw,3.2rem);letter-spacing:.01em;color:color-mix(in srgb,var(--c) 70%,var(--ink));line-height:1.1;text-align:center;margin:0}
+
+.next{position:absolute;right:18px;bottom:18px;display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:6px;border-radius:99px;
+  opacity:.5;transition:opacity .8s,transform .8s;transform-origin:right bottom;pointer-events:none;--n:#4FA36B}
+.next[hidden]{display:none}
+.next .bub{width:64px;height:64px;border-radius:50%;background:var(--n);display:grid;place-items:center;flex:none}
+.next .bub svg{width:60%;height:60%}
+.next .cap{display:flex;flex-direction:column;text-align:right;font-family:var(--f-kid);line-height:1.15}
+.next .cap small{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.next .cap b{font-weight:500;font-size:1.15rem}
+.next.go{opacity:1;transform:scale(1.35);pointer-events:auto;cursor:pointer}
+.next.go .bub{animation:ring 2.4s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--n) 55%,transparent)}100%{box-shadow:0 0 0 22px transparent}}
+.hint{position:absolute;left:0;right:0;bottom:20px;text-align:center;font-family:var(--f-kid);color:var(--ink2);font-size:1.05rem;padding-inline:150px}
+@media (max-width:560px){.hint{padding-inline:16px;bottom:96px}.stage{padding-bottom:130px}}
+
+/* ---------- caregiver panel ---------- */
+.care{background:var(--surface);border:1px solid var(--rule);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:18px}
+.care h2{font-size:.72rem;font-family:var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);margin:0;font-weight:500}
+.say{display:flex;flex-direction:column;gap:6px}
+.say p{margin:0;font-size:1.1rem;max-width:62ch}
+.say .ask{color:var(--ink2);font-size:.95rem}
+.left{font-family:var(--f-mono);font-size:.8rem;color:var(--ink2)}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--rule);background:var(--surface);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--ink2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn[disabled]{opacity:.4;cursor:default}
+.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.set label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--ink2)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:transparent;padding:8px 10px;cursor:pointer;font-weight:500;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+select{border:1px solid var(--rule);background:var(--surface);border-radius:10px;padding:8px 10px}
+.routine{display:flex;flex-direction:column}
+.rrow{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding-block:8px;border-top:1px solid var(--rule)}
+.rrow.now .nm{font-weight:600}
+.rrow .dot{width:22px;height:22px;border-radius:50%;background:var(--pc)}
+.step{display:flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:.85rem}
+.step button{width:28px;height:28px;border-radius:8px;border:1px solid var(--rule);background:var(--surface);cursor:pointer;line-height:1}
+.step span{min-width:44px;text-align:center}
+.foot{font-size:.82rem;color:var(--ink2);max-width:72ch}
+@media (prefers-reduced-motion:reduce){.stage.winding .core,.next.go .bub{animation:none}.time,.stage,.core{transition:none}}
+</style>
+
+<div class="app">
+
+<section class="stage" id="stage" aria-label="Child display">
+  <div class="strip" id="strip" hidden></div>
+  <div class="orb" id="orb"><div class="time" id="time"></div><div class="core" id="core"></div></div>
+  <p class="word" id="word" aria-live="polite"></p>
+  <button class="next" id="next" type="button" hidden aria-label="Start the next activity">
+    <span class="cap"><small>Next</small><b id="nextWord"></b></span>
+    <span class="bub" id="nextBub"></span>
+  </button>
+  <div class="hint" id="hint"></div>
+</section>
+
+<section class="care" aria-label="Caregiver controls">
+  <div class="say">
+    <h2>Say together</h2>
+    <p id="sayNow"></p>
+    <p class="ask" id="sayAsk"></p>
+    <span class="left" id="left"></span>
+  </div>
+
+  <div class="row">
+    <button class="btn primary" id="btnPause" type="button">Pause</button>
+    <button class="btn" id="btnPeek" type="button">Show what's next</button>
+    <button class="btn" id="btnSkip" type="button">Next activity</button>
+    <button class="btn" id="btnRestart" type="button">Restart</button>
+  </div>
+
+  <div class="set">
+    <label>Child's age
+      <div class="seg" role="group" aria-label="Child's age">
+        <button type="button" id="ageYoung" aria-pressed="false">2–3 years</button>
+        <button type="button" id="ageOlder" aria-pressed="true">3½–4½ years</button>
+      </div>
+    </label>
+    <label>Speed
+      <select id="speed">
+        <option value="1">Real time</option>
+        <option value="20" selected>Demo · 20× faster</option>
+        <option value="60">Demo · 60× faster</option>
+      </select>
+    </label>
+    <label>Soft chime
+      <div class="seg" role="group" aria-label="Soft chime">
+        <button type="button" id="soundOff" aria-pressed="true">Off</button>
+        <button type="button" id="soundOn" aria-pressed="false">On</button>
+      </div>
+    </label>
+  </div>
+
+  <div>
+    <h2>Evening routine · minutes</h2>
+    <div class="routine" id="routine"></div>
+  </div>
+
+  <p class="foot">Prototype for testing with real 2–4½-year-olds. The circle shows how much of an activity is left as area, not numbers. Durations are set by the caregiver; the child sees only the shrinking circle and what comes next. Assumptions this tests: toddlers read "big to small" as "nearly done", and a single dimmed "next" is enough future to hold.</p>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var ICON={
+    play:'<rect x="14" y="58" width="32" height="30" rx="5" fill="#fff"/><rect x="54" y="58" width="32" height="30" rx="5" fill="#fff"/><rect x="34" y="24" width="32" height="30" rx="5" fill="#fff" transform="rotate(-8 50 39)"/>',
+    tidy:'<path d="M14 50h72l-7 38H21z" fill="#fff"/><rect x="38" y="16" width="24" height="24" rx="5" fill="#fff"/><path d="M14 50h72" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/>',
+    bath:'<path d="M10 52h80v8a24 24 0 0 1-24 24H34A24 24 0 0 1 10 60z" fill="#fff"/><circle cx="32" cy="34" r="9" fill="none" stroke="#fff" stroke-width="6"/><circle cx="56" cy="24" r="6" fill="none" stroke="#fff" stroke-width="5"/><circle cx="72" cy="38" r="5" fill="none" stroke="#fff" stroke-width="5"/>',
+    teeth:'<g transform="rotate(-38 50 50)"><rect x="8" y="42" width="56" height="16" rx="8" fill="#fff"/><rect x="58" y="30" width="34" height="40" rx="7" fill="#fff"/><path d="M68 38v24M76 38v24M84 38v24" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/></g>',
+    story:'<path d="M50 30C38 21 22 21 10 26v50c12-5 28-5 40 4 12-9 28-9 40-4V26c-12-5-28-5-40 4z" fill="#fff"/><path d="M50 30v50" stroke="var(--c)" stroke-width="4"/>',
+    sleep:'<path d="M60 12a38 38 0 1 0 28 62A32 32 0 0 1 60 12z" fill="#fff"/><circle cx="78" cy="30" r="5" fill="#fff"/><circle cx="90" cy="50" r="3.5" fill="#fff"/>'
+  };
+  var pips=function(k){return '<svg viewBox="0 0 100 100" aria-hidden="true">'+ICON[k]+'</svg>'};
+
+  var R=[
+    {k:'play', label:'Playtime',   ing:'playing',          mins:8,  c:'#D98214'},
+    {k:'tidy', label:'Tidy up',    ing:'tidying up',       mins:3,  c:'#3E9A62'},
+    {k:'bath', label:'Bath time',  ing:'having a bath',    mins:10, c:'#2F86CC'},
+    {k:'teeth',label:'Brush teeth',ing:'brushing teeth',   mins:3,  c:'#1E9C96'},
+    {k:'story',label:'Story time', ing:'reading a story',  mins:8,  c:'#8462C2'},
+    {k:'sleep',label:'Sleep time', ing:'getting ready to sleep', mins:0, c:'#33448A', final:true}
+  ];
+  var S={idx:0,el:0,phase:'active',running:true,age:'older',speed:20,sound:false,peek:false,chimed:false};
+  var $=function(id){return document.getElementById(id)};
+  var stage=$('stage'),core=$('core'),time=$('time'),word=$('word'),next=$('next'),hint=$('hint');
+
+  function dur(i){return R[i].mins*60}
+  function reset(){S.idx=0;S.el=dur(0)*.35;S.phase='active';S.running=true;S.peek=false;S.chimed=false}
+  reset();
+
+  var actx=null;
+  function chime(n){
+    if(!S.sound)return;
+    try{
+      actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+      var notes=n===2?[523.25,659.25]:[523.25];
+      notes.forEach(function(f,i){
+        var o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime+i*.45;
+        o.type='sine';o.frequency.value=f;o.connect(g);g.connect(actx.destination);
+        g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.09,t+.05);g.gain.exponentialRampToValueAtTime(.0001,t+1.6);
+        o.start(t);o.stop(t+1.7);
+      });
+    }catch(e){}
+  }
+
+  function advance(){
+    if(S.idx>=R.length-1)return;
+    S.idx++;S.el=0;S.peek=false;S.chimed=false;
+    S.phase=R[S.idx].final?'final':'active';
+    render();
+  }
+
+  function progress(){var d=dur(S.idx);return d?Math.min(1,S.el/d):1}
+
+  function render(){
+    var a=R[S.idx],n=R[S.idx+1],p=progress();
+    stage.style.setProperty('--c',a.c);
+    core.innerHTML='<svg viewBox="0 0 100 100" aria-hidden="true">'+ICON[a.k]+'</svg>';
+    word.textContent=S.phase==='final'?'Goodnight':a.label;
+    var scale=a.final?.46:(.46+.54*(1-p));
+    time.style.setProperty('--s',scale/1);
+    time.style.visibility=a.final?'hidden':'visible';
+    stage.classList.toggle('winding',(p>.85&&S.phase==='active')||S.phase==='transition');
+
+    // next tile
+    var older=S.age==='older',show=!!n&&(older||S.peek||S.phase==='transition');
+    next.hidden=!show;
+    if(n){
+      next.style.setProperty('--n',n.c);
+      $('nextBub').innerHTML='<svg viewBox="0 0 100 100" aria-hidden="true">'+ICON[n.k]+'</svg>';
+      $('nextWord').textContent=n.label;
+    }
+    next.classList.toggle('go',S.phase==='transition');
+    hint.textContent=S.phase==='transition'?'All done! Tap what comes next.':(S.phase==='final'?'':'');
+
+    // day strip (older only)
+    var st=$('strip');st.hidden=!older;
+    st.innerHTML=R.map(function(r,i){
+      return '<span class="pip'+(i===S.idx?' now':'')+(i<S.idx?' done':'')+'" style="--pc:'+r.c+'">'+pips(r.k)+'</span>';
+    }).join('');
+
+    // caregiver
+    var now=S.phase==='final'?'The day is done. Time for sleep.':'We are '+a.ing+'.';
+    var tail='';
+    if(S.phase==='active'&&n)tail=' The big circle is getting smaller. When it is small, '+n.label.toLowerCase()+' comes next.';
+    if(S.phase==='transition')tail=' The circle is all gone. Now it is '+n.label.toLowerCase()+'.';
+    $('sayNow').textContent=now+tail;
+    $('sayAsk').textContent=S.phase==='transition'?'Ask: "Can you tap the picture of what is next?"':
+      (S.phase==='final'?'Ask: "What was your favourite part of today?"':'Ask: "Is the circle big or small now? What comes after this?"');
+    var rem=Math.max(0,dur(S.idx)-S.el);
+    $('left').textContent=a.final?'':(S.phase==='transition'?'Time is up':'About '+Math.ceil(rem/60)+' min left (caregiver only)');
+
+    $('btnPause').textContent=S.running?'Pause':'Resume';
+    $('btnPeek').hidden=older||!n||S.phase==='transition';
+    $('btnPeek').textContent=S.peek?'Hide what\'s next':'Show what\'s next';
+    $('btnSkip').disabled=!n;
+    $('btnSkip').textContent=n?'Start '+n.label.toLowerCase():'Last activity';
+    $('ageYoung').setAttribute('aria-pressed',String(!older));
+    $('ageOlder').setAttribute('aria-pressed',String(older));
+    $('soundOn').setAttribute('aria-pressed',String(S.sound));
+    $('soundOff').setAttribute('aria-pressed',String(!S.sound));
+    renderRoutine();
+  }
+
+  function renderRoutine(){
+    var box=$('routine');
+    box.innerHTML=R.map(function(r,i){
+      var ctl=r.final?'<span class="step"><span>bedtime</span></span>':
+        '<span class="step"><button type="button" data-i="'+i+'" data-d="-1" aria-label="Fewer minutes for '+r.label+'">−</button><span>'+r.mins+' min</span><button type="button" data-i="'+i+'" data-d="1" aria-label="More minutes for '+r.label+'">+</button></span>';
+      return '<div class="rrow'+(i===S.idx?' now':'')+'" style="--pc:'+r.c+'"><span class="dot"></span><span class="nm">'+r.label+'</span>'+ctl+'</div>';
+    }).join('');
+  }
+
+  // drawing loop: cheap updates only
+  function frame(){
+    var a=R[S.idx],p=progress();
+    time.style.setProperty('--s',a.final?.46:(.46+.54*(1-p)));
+  }
+  setInterval(function(){
+    if(!S.running||S.phase!=='active')return;
+    S.el+=.1*S.speed;
+    var p=progress();
+    if(p>=.85&&!S.chimed){S.chimed=true;chime(1);render()}
+    if(p>=1){S.phase='transition';chime(2);render();return}
+    frame();
+    if(Math.floor(S.el)%5===0)$('left').textContent='About '+Math.ceil(Math.max(0,dur(S.idx)-S.el)/60)+' min left (caregiver only)';
+  },100);
+
+  // events
+  $('btnPause').onclick=function(){S.running=!S.running;render()};
+  $('btnPeek').onclick=function(){S.peek=!S.peek;render()};
+  $('btnSkip').onclick=advance;
+  $('btnRestart').onclick=function(){reset();render()};
+  next.onclick=function(){if(S.phase==='transition')advance()};
+  $('ageYoung').onclick=function(){S.age='young';render()};
+  $('ageOlder').onclick=function(){S.age='older';render()};
+  $('soundOn').onclick=function(){S.sound=true;chime(1);render()};
+  $('soundOff').onclick=function(){S.sound=false;render()};
+  $('speed').onchange=function(e){S.speed=+e.target.value};
+  $('routine').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-i]');if(!b)return;
+    var i=+b.dataset.i,d=+b.dataset.d,v=Math.min(30,Math.max(1,R[i].mins+d));
+    R[i].mins=v;
+    if(i===S.idx&&S.phase==='active'&&S.el>=dur(i)){S.el=dur(i)-1}
+    render();
+  });
+
+  render();
+})();
+</script>
