@@ -3,10 +3,16 @@ package com.kidsclock.feature.run
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,40 +21,53 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.kidsclock.core.designsystem.KcTheme
+import com.kidsclock.core.designsystem.components.KcButton
 import com.kidsclock.core.designsystem.components.KcCircle
+import com.kidsclock.core.designsystem.components.KcGate
 import com.kidsclock.core.designsystem.components.KcScreen
+import com.kidsclock.core.designsystem.components.KcSheet
 import com.kidsclock.core.designsystem.components.KcText
+import com.kidsclock.core.designsystem.components.KcTextAlign
 import com.kidsclock.core.designsystem.components.KcTextStyle
 import com.kidsclock.core.model.ACTIVITY_BUBBLE_SCALE
 import com.kidsclock.core.model.PROGRESS_BUBBLE_NEUTRAL_ALPHA
 import com.kidsclock.core.model.Rgb
+import com.kidsclock.core.model.TrafficName
 import com.kidsclock.core.model.mix
 import com.kidsclock.core.model.progressBubbleScale
 import com.kidsclock.core.model.routine.ActivityColor
+import com.kidsclock.core.model.run.MORE_TIME_MINUTES
 import com.kidsclock.core.model.screenGradientCentreMix
 import com.kidsclock.core.model.screenGradientEdgeMix
 import com.kidsclock.core.model.trafficColour
+import com.kidsclock.core.model.trafficName
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 
 /**
  * Stateless (per ADR 0002: no `ViewModel`, no `core.model` type into any `Kc*` call). Test tags:
- * `run.screen` (root), `run.title`, `run.progressBubble`, `run.activityBubble`, `run.nextBubble`,
- * `run.nextLabel`, `run.nextName` (see docs/UI_AUTOMATION.md).
+ * `run.screen` (root), `run.title`, `run.hint`, `run.progressBubble`, `run.activityBubble`,
+ * `run.next` (the child's tap target), `run.nextBubble`, `run.nextLabel`, `run.nextName`, `run.gate`, `run.sheet` and `run.sheet.*`
+ * (see docs/UI_AUTOMATION.md). [hint] is the short "Not yet" line after an early or locked tap.
  */
 @Composable
 fun RunScreen(
     uiState: RunUiState,
-    onChildTap: () -> Unit,
+    actions: RunActions,
     modifier: Modifier = Modifier,
+    hint: Hint? = null,
 ) {
     when (uiState) {
-        is RunUiState.Running -> RunningContent(uiState, onChildTap, modifier)
+        is RunUiState.Running -> RunningContent(uiState, actions, hint, modifier)
         is RunUiState.Final ->
             KcScreen(testTag = "run.screen", modifier = modifier) {
                 KcText(text = uiState.prompt, testTag = "run.title", style = KcTextStyle.Title)
+                GrownUpGate(needed = false, onOpen = actions.onGateOpen)
+                GrownUpSheet(uiState, actions)
             }
     }
 }
@@ -56,7 +75,8 @@ fun RunScreen(
 @Composable
 private fun RunningContent(
     state: RunUiState.Running,
-    onChildTap: () -> Unit,
+    actions: RunActions,
+    hint: Hint?,
     modifier: Modifier,
 ) {
     val stageRgb = KcTheme.colors.stage.toRgb()
@@ -80,9 +100,11 @@ private fun RunningContent(
         KcScreen(
             testTag = "run.screen",
             background = gradient,
-            modifier = Modifier.pointerInput(onChildTap) { detectTapGestures(onTap = { onChildTap() }) },
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(KcTheme.spacing.s),
+            ) {
                 Box(contentAlignment = Alignment.Center) {
                     KcCircle(
                         size = orbSize * progressBubbleScale(state.progress).toFloat(),
@@ -97,29 +119,207 @@ private fun RunningContent(
                     }
                 }
                 KcText(text = state.activityName, testTag = "run.title", style = KcTextStyle.Title)
+                hintText(state, hint)?.let { KcText(text = it, testTag = "run.hint") }
             }
 
-            // A descendant of KcScreen's own Box, not a sibling: testTagsAsResourceId only reaches
-            // descendants, so a Next-tile sibling here would be invisible to UiAutomator/Maestro.
-            NextTile(state, orbSize = orbSize, modifier = Modifier.align(Alignment.BottomEnd))
+            // Descendants of KcScreen's own Box, not siblings: testTagsAsResourceId only reaches
+            // descendants, so siblings here would be invisible to UiAutomator/Maestro.
+            NextTile(
+                state,
+                orbSize = orbSize,
+                onTap = actions.onChildTap,
+                modifier = Modifier.align(Alignment.BottomEnd),
+            )
+            GrownUpGate(needed = state.grownUpNeeded, onOpen = actions.onGateOpen)
+            GrownUpSheet(state, actions)
         }
     }
 }
 
 @Composable
+private fun hintText(
+    state: RunUiState.Running,
+    hint: Hint?,
+): String? =
+    when {
+        hint == Hint.NotYet -> stringResource(R.string.run_hint_not_yet)
+        hint == Hint.GrownUpNeeded -> stringResource(R.string.run_hint_grown_up)
+        state.phase != Phase.Transition -> null
+        state.childCanStart -> stringResource(R.string.run_all_done_tap)
+        else -> stringResource(R.string.run_all_done_grown_up)
+    }
+
+@Composable
+private fun BoxScope.GrownUpGate(
+    needed: Boolean,
+    onOpen: () -> Unit,
+) {
+    KcGate(
+        testTag = "run.gate",
+        contentDescription = stringResource(R.string.run_gate_description),
+        onOpen = onOpen,
+        needed = needed,
+        modifier =
+            Modifier
+                .align(
+                    Alignment.TopStart,
+                ).windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(KcTheme.spacing.xs),
+    )
+}
+
+@Composable
+private fun BoxScope.GrownUpSheet(
+    state: RunUiState,
+    actions: RunActions,
+) {
+    // kc-a11y-ignore: every control here is a Kc* block, whose testTag parameter is required at compile time
+    KcSheet(visible = state.sheetOpen, onDismiss = actions.onSheetClose, testTag = "run.sheet") {
+        KcText(
+            text = stringResource(R.string.sheet_say_together),
+            testTag = "run.sheet.heading",
+            modifier = SheetFill,
+            align = KcTextAlign.Start,
+            style = KcTextStyle.Body,
+        )
+        when (state) {
+            is RunUiState.Final -> {
+                KcText(
+                    text = stringResource(R.string.sheet_say_final),
+                    testTag = "run.sheet.say",
+                    modifier = SheetFill,
+                    align = KcTextAlign.Start,
+                )
+                KcText(
+                    text = stringResource(R.string.sheet_ask_final),
+                    testTag = "run.sheet.ask",
+                    modifier = SheetFill,
+                    align = KcTextAlign.Start,
+                )
+            }
+            is RunUiState.Running -> RunningSheetContent(state, actions)
+        }
+        KcButton(
+            label = stringResource(R.string.sheet_close),
+            testTag = "run.sheet.close",
+            modifier = SheetFill,
+            onClick = actions.onSheetClose,
+        )
+    }
+}
+
+@Composable
+private fun RunningSheetContent(
+    state: RunUiState.Running,
+    actions: RunActions,
+) {
+    // kc-a11y-ignore: every control here is a Kc* block, whose testTag parameter is required at compile time
+    val transition = state.phase == Phase.Transition
+    KcText(
+        text =
+            if (transition) {
+                stringResource(R.string.sheet_say_transition, state.nextActivityName.lowercase())
+            } else {
+                stringResource(R.string.sheet_say_active, state.activityDoing, trafficColourWord(state.progress))
+            },
+        testTag = "run.sheet.say",
+        modifier = SheetFill,
+        align = KcTextAlign.Start,
+    )
+    KcText(
+        text = stringResource(if (transition) R.string.sheet_ask_transition else R.string.sheet_ask_active),
+        testTag = "run.sheet.ask",
+        modifier = SheetFill,
+        align = KcTextAlign.Start,
+    )
+    KcText(
+        text =
+            when {
+                transition -> stringResource(R.string.sheet_time_is_up)
+                state.paused -> stringResource(R.string.sheet_paused)
+                else -> stringResource(R.string.sheet_minutes_left, state.minutesLeft)
+            },
+        testTag = "run.sheet.left",
+        modifier = SheetFill,
+        align = KcTextAlign.Start,
+    )
+    if (!transition) {
+        KcButton(
+            label = stringResource(if (state.paused) R.string.sheet_resume else R.string.sheet_pause),
+            testTag = "run.sheet.pause",
+            modifier = SheetFill,
+            onClick = if (state.paused) actions.onResume else actions.onPause,
+        )
+    }
+    if (transition && state.canUnlockNext) {
+        KcButton(
+            label =
+                stringResource(
+                    if (state.nextUnlocked) R.string.sheet_child_can_start else R.string.sheet_let_child_start,
+                ),
+            testTag = "run.sheet.unlock",
+            modifier = SheetFill,
+            onClick = actions.onUnlockNext,
+            enabled = !state.nextUnlocked,
+        )
+    }
+    KcButton(
+        label = stringResource(R.string.sheet_start_next, state.nextActivityName.lowercase()),
+        testTag = "run.sheet.startNext",
+        modifier = SheetFill,
+        onClick = actions.onStartNext,
+    )
+    KcText(
+        text = stringResource(R.string.sheet_more_time),
+        testTag = "run.sheet.moreTime.heading",
+        modifier = SheetFill,
+        align = KcTextAlign.Start,
+    )
+    Row(horizontalArrangement = Arrangement.spacedBy(KcTheme.spacing.s)) {
+        MORE_TIME_MINUTES.forEach { minutes ->
+            KcButton(
+                label = stringResource(R.string.sheet_more_minutes, minutes),
+                testTag = "run.sheet.moreTime.$minutes",
+                modifier = Modifier.weight(1f),
+                onClick = { actions.onMoreTime(minutes) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun trafficColourWord(progress: Double): String =
+    stringResource(
+        when (trafficName(progress)) {
+            TrafficName.Green -> R.string.sheet_colour_green
+            TrafficName.Yellow -> R.string.sheet_colour_yellow
+            TrafficName.Red -> R.string.sheet_colour_red
+        },
+    )
+
+@Composable
 private fun NextTile(
     state: RunUiState.Running,
     orbSize: Dp,
+    onTap: () -> Unit,
     modifier: Modifier,
 ) {
     val dimmed = state.phase == Phase.Active
     val nextBubbleSize = orbSize * (if (dimmed) 0.22f else 0.30f)
     Column(
-        modifier = modifier.padding(KcTheme.spacing.m).alpha(if (dimmed) 0.5f else 1f),
+        modifier =
+            modifier
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .testTag("run.next")
+                // The only child tap target (SPEC §8). The padding below sits *inside* the tap area, so the
+                // target is larger than the visible tile without changing how it looks.
+                .pointerInput(onTap) { detectTapGestures(onTap = { onTap() }) }
+                .padding(KcTheme.spacing.m)
+                .alpha(if (dimmed) 0.5f else 1f),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(KcTheme.spacing.xs),
     ) {
-        KcText(text = "Next", testTag = "run.nextLabel", style = KcTextStyle.Body)
+        KcText(text = stringResource(R.string.run_next), testTag = "run.nextLabel", style = KcTextStyle.Body)
         KcCircle(
             size = nextBubbleSize,
             color = state.nextActivityColor?.toColor() ?: KcTheme.colors.inkSecondary,
@@ -160,3 +360,5 @@ private fun farthestCornerDistance(
         )
     return corners.maxOf { hypot((it.x - centre.x), (it.y - centre.y)) }
 }
+
+private val SheetFill = Modifier.fillMaxWidth()

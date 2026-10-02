@@ -61,3 +61,16 @@ private fun lerp(
     b: Int,
     t: Double,
 ): Int = (a + (b - a) * t).roundToInt()
+
+/** The colour word a grown-up says aloud (SPEC §9 "Say together"). */
+enum class TrafficName { Green, Yellow, Red }
+
+/** Green below 40%, yellow below 90%, then red. Progress is clamped to 0..1. */
+fun trafficName(progress: Double): TrafficName {
+    val p = progress.coerceIn(0.0, 1.0)
+    return when {
+        p < 0.4 -> TrafficName.Green
+        p < 0.9 -> TrafficName.Yellow
+        else -> TrafficName.Red
+    }
+}

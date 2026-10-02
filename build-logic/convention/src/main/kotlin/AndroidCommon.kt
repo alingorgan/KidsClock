@@ -24,7 +24,7 @@ internal fun configureLint(lint: Lint) {
     lint.warningsAsErrors = true
     lint.error += setOf("MissingPermission", "HardcodedText")
     // Versions are pinned on purpose (see ADR 0001) and these checks need the network, which breaks offline hooks.
-    lint.disable += setOf("GradleDependency", "NewerVersionAvailable")
+    lint.disable += setOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
 }
 
 /** Same JVM unit-test stack as core/model (JUnit Jupiter + kotlin.test), so tests look alike everywhere. */

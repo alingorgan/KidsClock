@@ -4,4 +4,5 @@ package com.kidsclock.core.model.routine
 data class FinalActivity(
     val name: String,
     val prompt: String,
+    val startPolicy: StartPolicy = StartPolicy.ChildTaps,
 )

@@ -3,17 +3,17 @@ package com.kidsclock.core.model.run
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/** SPEC §8 policy 1 (child taps) is the only handover policy modelled this slice. */
+/** SPEC §8 policy 1 (child taps). Policies 2 and 3 are in [Spec08_StartPolicyTest]. */
 class Spec08_ChildTapHandoverTest {
     @Test
-    fun Spec08_ChildTap_duringActiveDoesNothing() {
+    fun Spec08_ChildTap_duringActiveChangesNothingAndSaysNotYet() {
         val routine = testRoutine()
         val state = RunState.Active(routine, index = 0, startedAtElapsed = 0L)
 
         val result = RunReducer.reduce(state, Event.ChildTap, now = 500L)
 
         assertEquals(state, result.state)
-        assertEquals(emptyList(), result.effects)
+        assertEquals(listOf(Effect.ShowHint(HintKind.NotYet)), result.effects)
     }
 
     @Test

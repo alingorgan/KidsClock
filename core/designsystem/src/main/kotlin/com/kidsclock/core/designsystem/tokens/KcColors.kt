@@ -13,6 +13,11 @@ data class KcColors(
     /** Text/pictogram on top of a coloured bubble. */
     val onBubble: Color,
     val activity: KcActivityColors,
+    /** The grown-up gate dot, and the same dot when a grown-up is needed (SPEC §9, §8). */
+    val gate: Color,
+    val gateNeeded: Color,
+    /** Dims the child screen behind the grown-up sheet. */
+    val scrim: Color,
 )
 
 /** Fixed activity palette (SPEC §12). Same in light and dark. */
@@ -34,6 +39,9 @@ fun lightKcColors() =
         inkSecondary = Color(0xFF55636F),
         onBubble = Color(0xFFFFFFFF),
         activity = KcActivityColors(),
+        gate = Color(0xFF5B5BF0),
+        gateNeeded = Color(0xFFF0782B),
+        scrim = Color(0x66000000),
     )
 
 fun darkKcColors() =
@@ -43,4 +51,7 @@ fun darkKcColors() =
         inkSecondary = Color(0xFFA0AFBA),
         onBubble = Color(0xFFFFFFFF),
         activity = KcActivityColors(),
+        gate = Color(0xFF8A8AFF),
+        gateNeeded = Color(0xFFF08653),
+        scrim = Color(0x99000000),
     )

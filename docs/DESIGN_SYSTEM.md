@@ -7,7 +7,7 @@ It is also **where shared UI across features lives** — a component two `featur
 ## Layers
 1. **Tokens** (`tokens/`): colours (`KcColors`, activity palette from SPEC §12, light and dark), spacing (`KcSpacing`). Read them with `KcTheme.colors` / `KcTheme.spacing`. Never write a raw colour or dp value in a feature.
 2. **Theme** (`KidsClockTheme`): provides the tokens. Every screen and every snapshot test is wrapped in it.
-3. **Blocks** (`components/`): `KcScreen` (full-screen stage), `KcCircle` (solid or translucent circle, SPEC §4), `KcText` (the only text block), `KcButton` (the one tappable block, for grown-up controls). Add new blocks here, small and single-purpose; bigger pieces are composed from smaller blocks.
+3. **Blocks** (`components/`): `KcScreen` (full-screen stage), `KcCircle` (solid or translucent circle, SPEC §4), `KcText` (the only text block), `KcButton` (the one tappable block, for grown-up controls), `KcGate` (the press-and-hold grown-up dot, SPEC §9), `KcSheet` (the bottom sheet over a scrim, a `BoxScope` extension so it sits inside `KcScreen`). Add new blocks here, small and single-purpose; bigger pieces are composed from smaller blocks.
 
 ## Rules
 - Features use `Kc*` blocks only. Material 3 is a private dependency of `core/designsystem`; feature modules do not have it on their classpath, so bypassing the blocks is a compile error.

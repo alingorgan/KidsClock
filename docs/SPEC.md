@@ -60,7 +60,7 @@ Each activity (except the first) has a **starting policy**, set in setup:
 
 Taps before `transition`, or when locked, do nothing to the routine but give a short line: "Not yet. Watch the circle get small." / "Your grown-up will help with this one." When the grown-up is needed, the gate dot pulses in a warning colour.
 
-**Input handling:** act on pointer *release*, not click, so a stray drag or text selection cannot swallow a tap. No text selection on the child screen.
+**Input handling:** act on pointer *release*, not click, so a stray drag or text selection cannot swallow a tap. No text selection on the child screen. The **Next tile is the only child tap target**; taps elsewhere on the child screen do nothing. Its hit area extends about 16 dp beyond the visible tile, so a small hand does not have to be exact.
 
 Default demo policies: Playtime first; Tidy up = child taps; Bath = unlock; Teeth = child taps; Story = grown-up only.
 

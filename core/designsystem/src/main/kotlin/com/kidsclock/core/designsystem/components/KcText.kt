@@ -11,6 +11,8 @@ import com.kidsclock.core.designsystem.KcTheme
 
 enum class KcTextStyle { Title, Body }
 
+enum class KcTextAlign { Center, Start }
+
 /** The only text block. Colour defaults to the theme ink so contrast holds in light and dark. */
 @Composable
 fun KcText(
@@ -19,12 +21,13 @@ fun KcText(
     modifier: Modifier = Modifier,
     style: KcTextStyle = KcTextStyle.Body,
     color: Color = KcTheme.colors.ink,
+    align: KcTextAlign = KcTextAlign.Center,
 ) {
     Text(
         text = text,
         modifier = modifier.testTag(testTag),
         color = color,
-        textAlign = TextAlign.Center,
+        textAlign = if (align == KcTextAlign.Start) TextAlign.Start else TextAlign.Center,
         style =
             when (style) {
                 KcTextStyle.Title -> MaterialTheme.typography.headlineMedium

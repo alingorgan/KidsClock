@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="run_next">Next</string>
+    <string name="run_gate_description">Grown-up controls: press and hold</string>
+
+    <string name="run_hint_not_yet">Not yet. Watch the circle get small.</string>
+    <string name="run_hint_grown_up">Your grown-up will help with this one.</string>
+    <string name="run_all_done_tap">All done! Tap what comes next.</string>
+    <string name="run_all_done_grown_up">All done! Your grown-up will help.</string>
+
+    <string name="sheet_say_together">Say together</string>
+    <string name="sheet_say_active">We are %1$s. The big circle is getting smaller and the screen is %2$s. When it is red, we are out of time.</string>
+    <string name="sheet_say_transition">It is red. We are out of time. Now it is %1$s.</string>
+    <string name="sheet_say_final">The day is done. Time for sleep.</string>
+    <string name="sheet_ask_active">Ask: \"Is the circle big or small now? What comes after this?\"</string>
+    <string name="sheet_ask_transition">Ask: \"Can you show me what is next?\"</string>
+    <string name="sheet_ask_final">Ask: \"What was your favourite part of today?\"</string>
+    <string name="sheet_colour_green">green</string>
+    <string name="sheet_colour_yellow">yellow</string>
+    <string name="sheet_colour_red">red</string>
+    <string name="sheet_minutes_left">About %1$d min left (grown-up only)</string>
+    <string name="sheet_time_is_up">Time is up</string>
+    <string name="sheet_paused">Paused</string>
+    <string name="sheet_pause">Pause</string>
+    <string name="sheet_resume">Resume</string>
+    <string name="sheet_let_child_start">Let child start next</string>
+    <string name="sheet_child_can_start">Child can start next</string>
+    <string name="sheet_start_next">Start %1$s</string>
+    <string name="sheet_more_time">More time on this activity</string>
+    <string name="sheet_more_minutes">+%1$d min</string>
+    <string name="sheet_close">Close</string>
+</resources>
