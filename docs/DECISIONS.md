@@ -31,6 +31,8 @@ Confidence: **solid** = supported by evidence found; **plausible** = reasonable 
 | 25 | The routine persists between sessions (and, later, photos and clips). | Owner. | decision |
 | 26 | "More time on this activity" extends the current activity, is caregiver-only (behind the gate), and can be started before the activity ends or after it has ended (from the red screen). | Owner. Durations 5/10/15 min for now. Progress is measured against the new, longer total, so extending from red drops back (8 min + 5 min is about 62%, amber). | decision |
 | 27 | When a quick timer ends: chime, screen goes red, then the interrupted activity **auto-resumes after 5 seconds** with no interaction. | Owner. Keeps the child out of the loop; the interrupted activity was already started, so no handover policy applies. | decision |
+| 28 | "Something else now" is **not offered** while a quick timer is running or on its red screen, including a quick timer that was started from `transition` (and so has nothing to resume). | Owner. Keeps "no nesting" a simple rule: no quick-timer section anywhere in the sheet until the routine is back. | decision |
+| 29 | An interrupted activity that the grown-up had **paused** before the quick timer **comes back running** when it auto-resumes. | Owner. Auto-resume needs no interaction (decision 27), so it cannot wait for a Resume tap. | decision |
 
 ## Things the prototype does that the app should NOT copy
 See the list in `CLAUDE.md`. In particular, the prototype counts time in 100 ms ticks and starts the demo 20% in.
