@@ -55,7 +55,9 @@ recomposition). `Kc*` blocks stay stateless: plain parameters and lambdas, no `V
 `core/model` type passed in directly. Not yet built (`RunScreen` has no state yet); rationale and
 rejected alternatives (classic MVVM, MVVM+C, VIPER) are in `docs/adr/0002-ui-architecture.md`.
 
-## Timekeeping (design, not yet implemented)
+## Timekeeping
+**Decision 31: the run is not persisted for now.** After a kill or reboot the routine starts from the beginning. The design below (run anchor, boot id, wall-clock fallback; validated in `docs/spikes/02-timekeeping.md`) is kept for when persistence is added.
+
 - Time is derived from timestamps, never counted. `Clock.elapsedRealtimeMillis()` is implemented on Android over `SystemClock.elapsedRealtime()`.
 - The run anchor is persisted as `{activityIndex, startedAtElapsed, bootId, pausedAccumulated}`. Elapsed = `now - start - paused`.
 - If the boot id changed (reboot), elapsed-realtime is meaningless; fall back to a wall-clock timestamp saved with the anchor.

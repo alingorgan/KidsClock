@@ -63,3 +63,7 @@ No product questions from this round remain open.
     "Total silence" (couldn't be toggled from adb on this device/build) and ducking behaviour
     against another app already holding audio focus — both need a manual on-device check.
 16. Accessibility: TalkBack labels, reduced motion, contrast on the traffic colours.
+
+### Decided 2026-10-02 (persistence)
+- ~~**P1. Persisting a run across a kill or reboot.**~~ Not for now: the routine restarts from the beginning (decision 31). Open to revisit: full run persistence (the design is in `ARCHITECTURE.md` "Timekeeping") if kills happen mid-evening in real use.
+- ~~**P2. Can the child finish an activity early?**~~ No, only the grown-up, through the sheet (decision 30). Revisit after testing with a child.
