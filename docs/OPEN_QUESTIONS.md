@@ -57,11 +57,11 @@ No product questions from this round remain open.
     (31.6°C → 28.1°C) and charged normally. Still open: unplugged screen-on drain rate wasn't
     measured (the test device happened to be on the charger throughout) — needs a short follow-up
     run off the charger.
-15. Sound: volume control, quiet hours, silent mode and audio focus behaviour. Spiked:
-    `docs/spikes/03-audio-focus.md`. Confirmed the chime (played on `STREAM_MUSIC`) is unaffected
-    by ringer silent/vibrate mode on this device. Still open: behaviour under Do Not Disturb
-    "Total silence" (couldn't be toggled from adb on this device/build) and ducking behaviour
-    against another app already holding audio focus — both need a manual on-device check.
+15. ~~Sound: volume, silent mode, audio focus and Do Not Disturb.~~ Decided (decision 32): music stream
+    (unaffected by ringer silent/vibrate, `docs/spikes/03-audio-focus.md`), transient focus so other media
+    pauses and can resume, no Do Not Disturb exemption. Still to check by hand: other apps resuming after
+    the chime, and the chime in DND Priority-only versus Alarms-only. Quiet hours and a volume floor are
+    not planned.
 16. Accessibility: TalkBack labels, reduced motion, contrast on the traffic colours.
 
 ### Decided 2026-10-02 (persistence)

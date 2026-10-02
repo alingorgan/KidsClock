@@ -18,7 +18,8 @@ interface AlertPlayer {
 /**
  * Plays the SPEC §7 time-up chime, synthesised by [ChimeSynth] and played through [AudioTrack], so it is
  * the same sound on every device (not the OS's own tone). Uses the music stream (decision 19: silent and
- * vibrate ringer modes do not mute it) and requests [AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK].
+ * vibrate ringer modes do not mute it) and requests [AudioManager.AUDIOFOCUS_GAIN_TRANSIENT], so other
+ * media pauses (rather than just ducking) while it rings, and is handed focus back afterwards so it can resume.
  */
 class AndroidAlertPlayer(
     context: Context,
@@ -36,7 +37,7 @@ class AndroidAlertPlayer(
                 .build()
         val focusRequest =
             AudioFocusRequest
-                .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
                 .setAudioAttributes(attributes)
                 .setOnAudioFocusChangeListener {}
                 .build()
