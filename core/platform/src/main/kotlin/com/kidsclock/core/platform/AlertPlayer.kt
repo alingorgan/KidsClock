@@ -3,10 +3,12 @@ package com.kidsclock.core.platform
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
+import android.media.AudioFormat
 import android.media.AudioManager
-import android.media.ToneGenerator
+import android.media.AudioTrack
 import android.os.Handler
 import android.os.Looper
+import com.kidsclock.core.model.sound.ChimeSynth
 
 /** Plays the end-of-activity chime, requesting audio focus first (SPEC §7, ADR 0004). */
 interface AlertPlayer {
@@ -14,22 +16,22 @@ interface AlertPlayer {
 }
 
 /**
- * Spike-quality: a short tone via [ToneGenerator] stands in for the real synthesised chime.
- * Requests [AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK] per docs/DECISIONS.md, so Phase 1
- * spike (c) can observe what actually happens in silent mode, DND, and against another app holding
- * focus.
+ * Plays the SPEC §7 time-up chime, synthesised by [ChimeSynth] and played through [AudioTrack], so it is
+ * the same sound on every device (not the OS's own tone). Uses the music stream (decision 19: silent and
+ * vibrate ringer modes do not mute it) and requests [AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK].
  */
 class AndroidAlertPlayer(
     context: Context,
 ) : AlertPlayer {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val mainHandler = Handler(Looper.getMainLooper())
+    private val pcm: ShortArray by lazy { ChimeSynth.render(SAMPLE_RATE) }
 
     override fun playChime() {
         val attributes =
             AudioAttributes
                 .Builder()
-                .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build()
         val focusRequest =
@@ -38,19 +40,34 @@ class AndroidAlertPlayer(
                 .setAudioAttributes(attributes)
                 .setOnAudioFocusChangeListener {}
                 .build()
-
         val focusGranted = audioManager.requestAudioFocus(focusRequest) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
-        val toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME)
-        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, TONE_DURATION_MS)
+
+        val track =
+            AudioTrack
+                .Builder()
+                .setAudioAttributes(attributes)
+                .setAudioFormat(
+                    AudioFormat
+                        .Builder()
+                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                        .setSampleRate(SAMPLE_RATE)
+                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                        .build(),
+                ).setTransferMode(AudioTrack.MODE_STATIC)
+                .setBufferSizeInBytes(pcm.size * Short.SIZE_BYTES)
+                .build()
+        track.write(pcm, 0, pcm.size)
+        track.play()
 
         mainHandler.postDelayed({
-            toneGenerator.release()
+            track.release()
             if (focusGranted) audioManager.abandonAudioFocusRequest(focusRequest)
-        }, RELEASE_DELAY_MS)
+        }, (ChimeSynth.DURATION_SECONDS * MILLIS_PER_SECOND).toLong() + RELEASE_MARGIN_MS)
     }
 
     private companion object {
-        const val TONE_DURATION_MS = 400
-        const val RELEASE_DELAY_MS = 600L
+        const val SAMPLE_RATE = 44_100
+        const val MILLIS_PER_SECOND = 1_000
+        const val RELEASE_MARGIN_MS = 300L
     }
 }
