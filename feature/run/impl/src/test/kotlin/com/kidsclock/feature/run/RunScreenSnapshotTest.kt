@@ -253,4 +253,27 @@ class RunScreenSnapshotTest {
         compose.mainClock.advanceTimeBy(KC_FADE_MILLIS + 1_000L)
         compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_final_faded.png")
     }
+
+    @Test
+    fun nearlyDone_light() {
+        compose.mainClock.autoAdvance = false
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) {
+                RunScreen(uiState = running.copy(progress = 0.9, nearlyDone = true), actions = RunActions.None)
+            }
+        }
+        compose.mainClock.advanceTimeBy(1_600L)
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_nearlyDone_light.png")
+    }
+
+    @Test
+    fun transition_locked_reducedMotion_light() {
+        compose.mainClock.autoAdvance = false
+        compose.setContent {
+            KidsClockTheme(darkTheme = false, reduceMotion = true) {
+                RunScreen(uiState = lockedTransition, actions = RunActions.None)
+            }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_transition_locked_reducedMotion_light.png")
+    }
 }

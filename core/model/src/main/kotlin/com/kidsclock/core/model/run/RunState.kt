@@ -22,6 +22,8 @@ sealed interface RunState {
         val extraMillis: Long = 0,
         /** SPEC §10: set while a "Something else now" timer runs in place of routine item [index]. */
         val quickTimer: QuickTimer? = null,
+        /** SPEC §7: the soft nearly-done note has played for this stretch (reset by "More time"). */
+        val nearlyDoneSounded: Boolean = false,
     ) : RunState {
         /** What is on screen: the quick timer's activity, else routine item [index]. */
         val activity: Activity get() = quickTimer?.activity ?: routine.activities[index]
@@ -50,6 +52,8 @@ sealed interface RunState {
         val quickTimer: QuickTimer? = null,
         /** SPEC §10, decision 27: when the interrupted activity comes back by itself; null if none to resume. */
         val resumeAtElapsed: Long? = null,
+        /** SPEC §7 repeat mode: when the time-up chime plays again; null when not repeating. */
+        val nextChimeAtElapsed: Long? = null,
     ) : RunState {
         val activity: Activity get() = quickTimer?.activity ?: routine.activities[index]
 

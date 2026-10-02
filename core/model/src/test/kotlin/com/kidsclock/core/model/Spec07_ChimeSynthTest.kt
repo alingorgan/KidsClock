@@ -61,4 +61,15 @@ class Spec07_ChimeSynthTest {
         assertFailsWith<IllegalArgumentException> { ChimeSynth.render(0) }
         assertFailsWith<IllegalArgumentException> { ChimeSynth.render(-8_000) }
     }
+
+    @Test
+    fun Spec07_NearlyDone_isOneSoftC5NoteMuchQuieterThanTheChime() {
+        val note = ChimeSynth.renderNearlyDone(rate)
+
+        assertEquals((2.2 * rate).toInt(), note.size)
+        val peak = note.maxOf { abs(it.toInt()) }
+        assertEquals(0.3 * Short.MAX_VALUE, peak.toDouble(), 2.0)
+        assertTrue(peak < samples.maxOf { abs(it.toInt()) } / 2)
+        assertEquals(0, note.first().toInt())
+    }
 }

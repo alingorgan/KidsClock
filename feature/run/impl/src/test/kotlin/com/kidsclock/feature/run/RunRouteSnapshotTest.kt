@@ -24,7 +24,7 @@ class RunRouteSnapshotTest {
     fun light() {
         compose.setContent {
             KidsClockTheme(darkTheme = false) {
-                RunRoute(viewModelFactory = RunViewModelFactory(FakeClock(0L)), onPlayChime = {})
+                RunRoute(viewModelFactory = RunViewModelFactory(FakeClock(0L)), onPlayChime = {}, onPlayNearlyDone = {})
             }
         }
         compose.onRoot().captureRoboImage("src/test/snapshots/RunRoute_light.png")
@@ -34,7 +34,7 @@ class RunRouteSnapshotTest {
     fun dark() {
         compose.setContent {
             KidsClockTheme(darkTheme = true) {
-                RunRoute(viewModelFactory = RunViewModelFactory(FakeClock(0L)), onPlayChime = {})
+                RunRoute(viewModelFactory = RunViewModelFactory(FakeClock(0L)), onPlayChime = {}, onPlayNearlyDone = {})
             }
         }
         compose.onRoot().captureRoboImage("src/test/snapshots/RunRoute_dark.png")

@@ -13,6 +13,9 @@ enum class HintKind {
 sealed interface Effect {
     data object PlayChime : Effect
 
+    /** SPEC §7: the one soft bell note at nearly done. */
+    data object PlayNearlyDone : Effect
+
     data class ShowHint(
         val kind: HintKind,
     ) : Effect

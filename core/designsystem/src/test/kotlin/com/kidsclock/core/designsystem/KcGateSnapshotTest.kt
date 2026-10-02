@@ -57,4 +57,18 @@ class KcGateSnapshotTest {
         }
         compose.onRoot().captureRoboImage("src/test/snapshots/KcGate_needed_light.png")
     }
+
+    @Test
+    fun needed_reducedMotion_light() {
+        compose.mainClock.autoAdvance = false
+        compose.setContent {
+            KidsClockTheme(darkTheme = false, reduceMotion = true) {
+                KcScreen(testTag = "screen") {
+                    KcGate(testTag = "gate", contentDescription = "Grown-up controls", onOpen = {}, needed = true)
+                }
+            }
+        }
+        compose.mainClock.advanceTimeBy(400L)
+        compose.onRoot().captureRoboImage("src/test/snapshots/KcGate_needed_reducedMotion_light.png")
+    }
 }

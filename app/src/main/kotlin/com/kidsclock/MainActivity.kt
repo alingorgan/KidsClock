@@ -23,6 +23,7 @@ class MainActivity : ComponentActivity() {
                 RunRoute(
                     viewModelFactory = appContainer.runViewModelFactory,
                     onPlayChime = { appContainer.alertPlayer.playChime() },
+                    onPlayNearlyDone = { appContainer.alertPlayer.playNearlyDone() },
                 )
             }
         }

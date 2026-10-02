@@ -7,6 +7,8 @@ enum class Hint { NotYet, GrownUpNeeded }
 sealed interface RunEffect {
     data object PlayChime : RunEffect
 
+    data object PlayNearlyDone : RunEffect
+
     data class ShowHint(
         val hint: Hint,
     ) : RunEffect

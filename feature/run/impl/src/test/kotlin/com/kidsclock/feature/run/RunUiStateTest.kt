@@ -238,4 +238,15 @@ class RunUiStateTest {
         assertEquals(8, running(state, now = 0L).minutesLeft)
         assertEquals(7, running(state, now = 1_000L).minutesLeft)
     }
+
+    @Test
+    fun theBreathingStartsAt85PercentAndStopsWhenPausedOrRed() {
+        val active = RunState.Active(eveningRoutine(1_000L), 0, startedAtElapsed = 0L)
+
+        assertEquals(false, running(active, now = 6_799L).nearlyDone)
+        assertEquals(true, running(active, now = 6_800L).nearlyDone)
+        val paused = RunState.Active(eveningRoutine(1_000L), 0, 0L, pausedAtElapsed = 7_000L)
+        assertEquals(false, running(paused, now = 7_500L).nearlyDone)
+        assertEquals(false, running(RunState.Transition(eveningRoutine(1_000L), 0), now = 8_000L).nearlyDone)
+    }
 }

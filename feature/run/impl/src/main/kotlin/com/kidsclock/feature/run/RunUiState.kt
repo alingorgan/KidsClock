@@ -8,6 +8,7 @@ import com.kidsclock.core.model.run.RunState
 import com.kidsclock.core.model.run.childCanStart
 import com.kidsclock.core.model.run.interruptedActivity
 import com.kidsclock.core.model.run.nextStartPolicy
+import com.kidsclock.core.model.sound.NEARLY_DONE_PROGRESS
 
 /** SPEC §5 phases relevant to what's on screen while an activity is running. */
 enum class Phase { Active, Transition }
@@ -43,6 +44,8 @@ sealed interface RunUiState {
         val nextIsInterrupted: Boolean = false,
         /** SPEC §10, decision 27: red after a quick timer, the interrupted activity returns by itself. */
         val autoResuming: Boolean = false,
+        /** SPEC §7: from 85% on, the picture breathes (not while paused or on the red screen). */
+        val nearlyDone: Boolean = false,
         override val sheetOpen: Boolean = false,
     ) : RunUiState {
         /** SPEC §9: the gate dot pulses when it is time to move on and the child cannot do it. */
@@ -72,6 +75,7 @@ fun RunState.toUiState(
                 canStartElse = quickTimer == null,
                 elsePreset = elsePreset,
                 elseMinutes = elseMinutes,
+                nearlyDone = !isPaused && progress(now) >= NEARLY_DONE_PROGRESS,
             )
         is RunState.Transition ->
             running(this, activity, Phase.Transition, 1.0, sheetOpen).copy(

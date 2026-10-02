@@ -52,13 +52,17 @@ fun KcGate(
     holdMillis: Long = KC_GATE_HOLD_MILLIS,
 ) {
     val ring = remember { Animatable(0f) }
+    // SPEC §7b: with reduced motion the dot does not pulse; "needed" is then a steady larger dot (and
+    // the warning colour), so it is still not colour alone.
+    val reduceMotion = KcTheme.reduceMotion
     val pulse =
         rememberInfiniteTransition(label = "gate").animateFloat(
             initialValue = 1f,
-            targetValue = if (needed) 1.5f else 1f,
+            targetValue = if (needed && !reduceMotion) NEEDED_SCALE else 1f,
             animationSpec = infiniteRepeatable(tween(PULSE_MILLIS), RepeatMode.Reverse),
             label = "gatePulse",
         )
+    val dotScale = if (needed && reduceMotion) NEEDED_SCALE else pulse.value
     val dot = if (needed) KcTheme.colors.gateNeeded else KcTheme.colors.gate
     val ringColour = KcTheme.colors.ink
     Box(
@@ -94,7 +98,7 @@ fun KcGate(
     ) {
         Canvas(Modifier.size(GATE_TOUCH_SIZE)) {
             val centre = Offset(size.width / 2, size.height / 2)
-            val radius = DOT_SIZE.toPx() / 2 * pulse.value
+            val radius = DOT_SIZE.toPx() / 2 * dotScale
             drawCircle(Color.White, radius + BORDER.toPx(), centre)
             drawCircle(dot, radius, centre)
             if (ring.value > 0f) {
@@ -119,3 +123,4 @@ private val BORDER = 3.dp
 private val RING_INSET = 4.dp
 private val RING_WIDTH = 3.dp
 private const val PULSE_MILLIS = 800
+private const val NEEDED_SCALE = 1.5f

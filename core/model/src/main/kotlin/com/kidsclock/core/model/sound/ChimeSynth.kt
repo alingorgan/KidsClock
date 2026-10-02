@@ -21,17 +21,28 @@ object ChimeSynth {
     /** Peak level of the whole chime, as a fraction of full scale. */
     const val PEAK = 0.9
 
-    /** Total length: the last note starts at 3 × spacing and rings for [DECAY_SECONDS]. */
+    /** Total length of the time-up chime: the last note starts at 3 × spacing and rings for [DECAY_SECONDS]. */
     val DURATION_SECONDS: Double = (NOTES_HZ.size - 1) * NOTE_SPACING_SECONDS + DECAY_SECONDS
 
     // The envelope falls 60 dB over DECAY_SECONDS.
     private val tau = DECAY_SECONDS / ln(1000.0)
 
-    fun render(sampleRate: Int): ShortArray {
+    /** SPEC §7 "Nearly done": one soft bell note, C5, at low volume. */
+    const val NEARLY_DONE_PEAK = 0.3
+
+    fun render(sampleRate: Int): ShortArray = render(sampleRate, NOTES_HZ, PEAK)
+
+    fun renderNearlyDone(sampleRate: Int): ShortArray = render(sampleRate, listOf(NOTES_HZ.first()), NEARLY_DONE_PEAK)
+
+    private fun render(
+        sampleRate: Int,
+        notes: List<Double>,
+        peakLevel: Double,
+    ): ShortArray {
         require(sampleRate > 0) { "Sample rate must be positive" }
-        val total = (DURATION_SECONDS * sampleRate).toInt()
+        val total = ((notes.size - 1) * NOTE_SPACING_SECONDS * sampleRate + DECAY_SECONDS * sampleRate).toInt()
         val mix = DoubleArray(total)
-        NOTES_HZ.forEachIndexed { index, hz ->
+        notes.forEachIndexed { index, hz ->
             val start = (index * NOTE_SPACING_SECONDS * sampleRate).toInt()
             for (i in start until total) {
                 val t = (i - start).toDouble() / sampleRate
@@ -42,7 +53,7 @@ object ChimeSynth {
             }
         }
         val peak = mix.maxOf { kotlin.math.abs(it) }
-        val scale = if (peak > 0) PEAK * Short.MAX_VALUE / peak else 0.0
+        val scale = if (peak > 0) peakLevel * Short.MAX_VALUE / peak else 0.0
         return ShortArray(total) { (mix[it] * scale).toInt().toShort() }
     }
 }

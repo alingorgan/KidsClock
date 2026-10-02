@@ -19,6 +19,7 @@ private const val HINT_MILLIS = 2_500L
 fun RunRoute(
     viewModelFactory: RunViewModelFactory,
     onPlayChime: () -> Unit,
+    onPlayNearlyDone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: RunViewModel = viewModel(factory = viewModelFactory)
@@ -29,6 +30,7 @@ fun RunRoute(
         viewModel.effects.collect { effect ->
             when (effect) {
                 RunEffect.PlayChime -> onPlayChime()
+                RunEffect.PlayNearlyDone -> onPlayNearlyDone()
                 is RunEffect.ShowHint -> hint = effect.hint
             }
         }

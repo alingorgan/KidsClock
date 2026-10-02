@@ -1,6 +1,9 @@
 package com.kidsclock.core.model.run
 
 import com.kidsclock.core.model.routine.QUICK_TIMER_MINUTES
+import com.kidsclock.core.model.sound.ChimeMode
+import com.kidsclock.core.model.sound.NEARLY_DONE_PROGRESS
+import com.kidsclock.core.model.sound.REPEAT_INTERVAL_MILLIS
 
 /** Result of [RunReducer.reduce]: the next state, plus any effects to perform once. */
 data class ReduceResult(
@@ -38,18 +41,14 @@ object RunReducer {
         now: Long,
     ): ReduceResult =
         when (event) {
-            is Event.Tick ->
-                if (!state.isPaused && state.progress(now) >= 1.0) {
-                    ReduceResult(state.toTransition(now), listOf(Effect.PlayChime))
-                } else {
-                    ReduceResult(state)
-                }
+            is Event.Tick -> tickActive(state, now)
+            Event.SheetOpened -> ReduceResult(state)
             Event.ChildTap -> ReduceResult(state, listOf(Effect.ShowHint(HintKind.NotYet)))
             Event.Pause -> ReduceResult(if (state.isPaused) state else state.copy(pausedAtElapsed = now))
             Event.Resume -> ReduceResult(resumed(state, now))
             Event.UnlockNext -> ReduceResult(state)
             Event.GrownUpStartNext -> ReduceResult(startNext(state, now))
-            is Event.AddTime -> ReduceResult(addTime(state, event.minutes))
+            is Event.AddTime -> ReduceResult(addTime(state, event.minutes, now))
             is Event.StartQuickTimer -> ReduceResult(startQuickTimer(state, event, now))
         }
 
@@ -63,10 +62,16 @@ object RunReducer {
             is Event.Tick ->
                 if (state.resumeAtElapsed != null && now >= state.resumeAtElapsed) {
                     ReduceResult(resumeInterrupted(state, now))
+                } else if (state.nextChimeAtElapsed != null && now >= state.nextChimeAtElapsed) {
+                    ReduceResult(
+                        state.copy(nextChimeAtElapsed = now + REPEAT_INTERVAL_MILLIS),
+                        listOf(Effect.PlayChime),
+                    )
                 } else {
                     ReduceResult(state)
                 }
             Event.Pause, Event.Resume -> ReduceResult(state)
+            Event.SheetOpened -> ReduceResult(state.copy(nextChimeAtElapsed = null))
             // During the auto-resume wait the child's tap does nothing and shows no hint (SPEC §10).
             Event.ChildTap ->
                 if (state.isAutoResuming) {
@@ -82,6 +87,35 @@ object RunReducer {
             is Event.StartQuickTimer -> ReduceResult(startQuickTimer(state, event, now))
         }
 
+    /** SPEC §7: the soft note at nearly done, the time-up chime (and its repeat) at the end; "No sound" mutes both. */
+    private fun tickActive(
+        state: RunState.Active,
+        now: Long,
+    ): ReduceResult {
+        if (state.isPaused) return ReduceResult(state)
+        val sound = state.routine.sound
+        val progress = state.progress(now)
+        return when {
+            progress >= 1.0 ->
+                ReduceResult(
+                    state.toTransition(now),
+                    if (sound.chime ==
+                        ChimeMode.None
+                    ) {
+                        emptyList()
+                    } else {
+                        listOf(Effect.PlayChime)
+                    },
+                )
+            progress >= NEARLY_DONE_PROGRESS && !state.nearlyDoneSounded && sound.nearlyDoneNote ->
+                ReduceResult(
+                    state.copy(nearlyDoneSounded = true),
+                    if (sound.chime == ChimeMode.None) emptyList() else listOf(Effect.PlayNearlyDone),
+                )
+            else -> ReduceResult(state)
+        }
+    }
+
     private fun RunState.Active.toTransition(now: Long) =
         RunState.Transition(
             routine,
@@ -91,6 +125,13 @@ object RunReducer {
             extraMillis,
             quickTimer = quickTimer,
             resumeAtElapsed = if (quickTimer?.interrupted != null) now + AUTO_RESUME_MILLIS else null,
+            // Repeat mode does not apply while waiting to hand back to an interrupted activity.
+            nextChimeAtElapsed =
+                if (routine.sound.chime == ChimeMode.Repeating && quickTimer?.interrupted == null) {
+                    now + REPEAT_INTERVAL_MILLIS
+                } else {
+                    null
+                },
         )
 
     /** SPEC §10: "Something else now" pauses the current activity (or just runs, from `transition`). */
@@ -136,14 +177,16 @@ object RunReducer {
     private fun addTime(
         state: RunState.Active,
         minutes: Int,
-    ): RunState.Active =
-        if (minutes in
-            MORE_TIME_MINUTES
-        ) {
-            state.copy(extraMillis = state.extraMillis + minutes * state.routine.minuteMillis)
-        } else {
-            state
-        }
+        now: Long,
+    ): RunState.Active {
+        if (minutes !in MORE_TIME_MINUTES) return state
+        val extended = state.copy(extraMillis = state.extraMillis + minutes * state.routine.minuteMillis)
+        // Progress drops back, so the nearly-done note can play again when it is reached again.
+        return extended.copy(
+            nearlyDoneSounded =
+                extended.nearlyDoneSounded && extended.progress(now) >= NEARLY_DONE_PROGRESS,
+        )
+    }
 
     /**
      * SPEC §10: from the red screen, "More time" returns the activity to `active` against the longer total.

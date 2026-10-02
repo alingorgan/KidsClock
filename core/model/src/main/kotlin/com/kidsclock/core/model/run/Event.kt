@@ -15,6 +15,9 @@ sealed interface Event {
 
     data object Resume : Event
 
+    /** The grown-up opened the sheet: SPEC §7 repeat mode stops. */
+    data object SheetOpened : Event
+
     /** SPEC §8 policy 2: the grown-up lets the child start the next activity. */
     data object UnlockNext : Event
 

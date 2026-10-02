@@ -52,9 +52,10 @@ class RunViewModel(
 
     fun onChildTap() = dispatch(Event.ChildTap)
 
+    /** Opening the sheet also stops SPEC §7's repeating chime. */
     fun onGateOpened() {
         sheetOpen = true
-        publish(clock.elapsedRealtimeMillis())
+        dispatch(Event.SheetOpened)
     }
 
     fun onSheetClosed() {
@@ -125,6 +126,7 @@ class RunViewModel(
         result.effects.forEach { effect ->
             when (effect) {
                 Effect.PlayChime -> _effects.trySend(RunEffect.PlayChime)
+                Effect.PlayNearlyDone -> _effects.trySend(RunEffect.PlayNearlyDone)
                 is Effect.ShowHint -> _effects.trySend(RunEffect.ShowHint(effect.kind.toHint()))
             }
         }

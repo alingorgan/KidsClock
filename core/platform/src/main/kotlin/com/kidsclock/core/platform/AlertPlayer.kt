@@ -13,6 +13,9 @@ import com.kidsclock.core.model.sound.ChimeSynth
 /** Plays the end-of-activity chime, requesting audio focus first (SPEC §7, ADR 0004). */
 interface AlertPlayer {
     fun playChime()
+
+    /** SPEC §7: the one soft note at nearly done. Ducks other audio instead of pausing it. */
+    fun playNearlyDone()
 }
 
 /**
@@ -26,9 +29,19 @@ class AndroidAlertPlayer(
 ) : AlertPlayer {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val mainHandler = Handler(Looper.getMainLooper())
-    private val pcm: ShortArray by lazy { ChimeSynth.render(SAMPLE_RATE) }
+    private val chime: ShortArray by lazy { ChimeSynth.render(SAMPLE_RATE) }
+    private val nearlyDone: ShortArray by lazy { ChimeSynth.renderNearlyDone(SAMPLE_RATE) }
 
-    override fun playChime() {
+    override fun playChime() = play(chime, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT, ChimeSynth.DURATION_SECONDS)
+
+    override fun playNearlyDone() =
+        play(nearlyDone, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK, NEARLY_DONE_SECONDS)
+
+    private fun play(
+        pcm: ShortArray,
+        focusGain: Int,
+        seconds: Double,
+    ) {
         val attributes =
             AudioAttributes
                 .Builder()
@@ -37,7 +50,7 @@ class AndroidAlertPlayer(
                 .build()
         val focusRequest =
             AudioFocusRequest
-                .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                .Builder(focusGain)
                 .setAudioAttributes(attributes)
                 .setOnAudioFocusChangeListener {}
                 .build()
@@ -63,11 +76,12 @@ class AndroidAlertPlayer(
         mainHandler.postDelayed({
             track.release()
             if (focusGranted) audioManager.abandonAudioFocusRequest(focusRequest)
-        }, (ChimeSynth.DURATION_SECONDS * MILLIS_PER_SECOND).toLong() + RELEASE_MARGIN_MS)
+        }, (seconds * MILLIS_PER_SECOND).toLong() + RELEASE_MARGIN_MS)
     }
 
     private companion object {
         const val SAMPLE_RATE = 44_100
+        const val NEARLY_DONE_SECONDS = ChimeSynth.DECAY_SECONDS
         const val MILLIS_PER_SECOND = 1_000
         const val RELEASE_MARGIN_MS = 300L
     }

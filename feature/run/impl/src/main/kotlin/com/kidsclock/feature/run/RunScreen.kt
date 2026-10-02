@@ -36,6 +36,7 @@ import com.kidsclock.core.designsystem.components.KcSheet
 import com.kidsclock.core.designsystem.components.KcText
 import com.kidsclock.core.designsystem.components.KcTextAlign
 import com.kidsclock.core.designsystem.components.KcTextStyle
+import com.kidsclock.core.designsystem.components.kcBreathing
 import com.kidsclock.core.designsystem.components.rememberKcFade
 import com.kidsclock.core.model.ACTIVITY_BUBBLE_SCALE
 import com.kidsclock.core.model.PROGRESS_BUBBLE_NEUTRAL_ALPHA
@@ -142,6 +143,7 @@ private fun RunningContent(
                             size = orbSize * ACTIVITY_BUBBLE_SCALE.toFloat(),
                             color = state.activityColor.toColor(),
                             testTag = "run.activityBubble",
+                            modifier = Modifier.kcBreathing(state.nearlyDone),
                         )
                     }
                 }
