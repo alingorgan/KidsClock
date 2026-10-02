@@ -1,5 +1,7 @@
 package com.kidsclock.core.model.run
 
+import com.kidsclock.core.model.routine.QuickTimerPreset
+
 /** Inputs to [RunReducer.reduce]. */
 sealed interface Event {
     data class Tick(
@@ -21,6 +23,12 @@ sealed interface Event {
 
     /** SPEC §10 "More time"; only [MORE_TIME_MINUTES] are accepted. */
     data class AddTime(
+        val minutes: Int,
+    ) : Event
+
+    /** SPEC §10 "Something else now"; only [QUICK_TIMER_MINUTES] are accepted. */
+    data class StartQuickTimer(
+        val preset: QuickTimerPreset,
         val minutes: Int,
     ) : Event
 }

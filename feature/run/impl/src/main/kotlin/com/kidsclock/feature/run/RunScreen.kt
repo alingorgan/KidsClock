@@ -20,12 +20,15 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.kidsclock.core.designsystem.KcTheme
 import com.kidsclock.core.designsystem.components.KcButton
+import com.kidsclock.core.designsystem.components.KcChoice
 import com.kidsclock.core.designsystem.components.KcCircle
 import com.kidsclock.core.designsystem.components.KcGate
 import com.kidsclock.core.designsystem.components.KcScreen
@@ -33,6 +36,7 @@ import com.kidsclock.core.designsystem.components.KcSheet
 import com.kidsclock.core.designsystem.components.KcText
 import com.kidsclock.core.designsystem.components.KcTextAlign
 import com.kidsclock.core.designsystem.components.KcTextStyle
+import com.kidsclock.core.designsystem.components.rememberKcFade
 import com.kidsclock.core.model.ACTIVITY_BUBBLE_SCALE
 import com.kidsclock.core.model.PROGRESS_BUBBLE_NEUTRAL_ALPHA
 import com.kidsclock.core.model.Rgb
@@ -40,6 +44,8 @@ import com.kidsclock.core.model.TrafficName
 import com.kidsclock.core.model.mix
 import com.kidsclock.core.model.progressBubbleScale
 import com.kidsclock.core.model.routine.ActivityColor
+import com.kidsclock.core.model.routine.QUICK_TIMER_MINUTES
+import com.kidsclock.core.model.routine.QuickTimerPreset
 import com.kidsclock.core.model.run.MORE_TIME_MINUTES
 import com.kidsclock.core.model.screenGradientCentreMix
 import com.kidsclock.core.model.screenGradientEdgeMix
@@ -64,11 +70,32 @@ fun RunScreen(
     when (uiState) {
         is RunUiState.Running -> RunningContent(uiState, actions, hint, modifier)
         is RunUiState.Final ->
-            KcScreen(testTag = "run.screen", modifier = modifier) {
-                KcText(text = uiState.prompt, testTag = "run.title", style = KcTextStyle.Title)
-                GrownUpGate(needed = false, onOpen = actions.onGateOpen)
-                GrownUpSheet(uiState, actions)
-            }
+            FinalContent(uiState, actions, modifier)
+    }
+}
+
+/** Decision 23: for Sleep time the stage and the text blend to near-black and light over 5 s, no chime. */
+@Composable
+private fun FinalContent(
+    state: RunUiState.Final,
+    actions: RunActions,
+    modifier: Modifier,
+) {
+    val fade = rememberKcFade(active = state.fadesToDark)
+    val colors = KcTheme.colors
+    KcScreen(
+        testTag = "run.screen",
+        modifier = modifier,
+        background = SolidColor(lerp(colors.stage, colors.fadeStage, fade)),
+    ) {
+        KcText(
+            text = state.prompt,
+            testTag = "run.title",
+            style = KcTextStyle.Title,
+            color = lerp(colors.ink, colors.fadeInk, fade),
+        )
+        GrownUpGate(needed = false, onOpen = actions.onGateOpen)
+        GrownUpSheet(state, actions)
     }
 }
 
@@ -144,6 +171,7 @@ private fun hintText(
     when {
         hint == Hint.NotYet -> stringResource(R.string.run_hint_not_yet)
         hint == Hint.GrownUpNeeded -> stringResource(R.string.run_hint_grown_up)
+        state.autoResuming -> stringResource(R.string.run_all_done_back_to, state.nextActivityName)
         state.phase != Phase.Transition -> null
         state.childCanStart -> stringResource(R.string.run_all_done_tap)
         else -> stringResource(R.string.run_all_done_grown_up)
@@ -264,7 +292,11 @@ private fun RunningSheetContent(
         )
     }
     KcButton(
-        label = stringResource(R.string.sheet_start_next, state.nextActivityName.lowercase()),
+        label =
+            stringResource(
+                if (state.nextIsInterrupted) R.string.sheet_back_to_now else R.string.sheet_start_next,
+                state.nextActivityName.lowercase(),
+            ),
         testTag = "run.sheet.startNext",
         modifier = SheetFill,
         onClick = actions.onStartNext,
@@ -285,7 +317,78 @@ private fun RunningSheetContent(
             )
         }
     }
+    if (state.canStartElse) {
+        SomethingElseSection(state, actions)
+    }
 }
+
+/** SPEC §10 "Something else now": pick a preset and minutes, then Start. */
+@Composable
+private fun SomethingElseSection(
+    state: RunUiState.Running,
+    actions: RunActions,
+) {
+    // kc-a11y-ignore: every control here is a Kc* block, whose testTag parameter is required at compile time
+    KcText(
+        text = stringResource(R.string.sheet_something_else),
+        testTag = "run.sheet.else.heading",
+        modifier = SheetFill,
+        align = KcTextAlign.Start,
+    )
+    QuickTimerPreset.entries.chunked(2).forEach { row ->
+        Row(horizontalArrangement = Arrangement.spacedBy(KcTheme.spacing.s)) {
+            row.forEach { preset ->
+                KcChoice(
+                    label = stringResource(preset.labelRes()),
+                    selected = state.elsePreset == preset,
+                    testTag = "run.sheet.else.${preset.tagName()}",
+                    modifier = Modifier.weight(1f),
+                    onClick = { actions.onSelectPreset(preset) },
+                )
+            }
+        }
+    }
+    KcText(
+        text = stringResource(R.string.sheet_else_minutes_heading),
+        testTag = "run.sheet.else.minutes.heading",
+        modifier = SheetFill,
+        align = KcTextAlign.Start,
+    )
+    Row(horizontalArrangement = Arrangement.spacedBy(KcTheme.spacing.xs)) {
+        QUICK_TIMER_MINUTES.forEach { minutes ->
+            KcChoice(
+                label = stringResource(R.string.sheet_else_minutes, minutes),
+                selected = state.elseMinutes == minutes,
+                testTag = "run.sheet.else.minutes.$minutes",
+                modifier = Modifier.weight(1f),
+                onClick = { actions.onSelectMinutes(minutes) },
+            )
+        }
+    }
+    KcButton(
+        label = stringResource(R.string.sheet_else_start),
+        testTag = "run.sheet.else.start",
+        modifier = SheetFill,
+        onClick = actions.onStartElse,
+        enabled = state.elsePreset != null && state.elseMinutes != null,
+    )
+}
+
+private fun QuickTimerPreset.labelRes(): Int =
+    when (this) {
+        QuickTimerPreset.Playground -> R.string.preset_playground
+        QuickTimerPreset.OutsideTime -> R.string.preset_outside
+        QuickTimerPreset.FreePlay -> R.string.preset_free_play
+        QuickTimerPreset.SnackTime -> R.string.preset_snack
+    }
+
+private fun QuickTimerPreset.tagName(): String =
+    when (this) {
+        QuickTimerPreset.Playground -> "playground"
+        QuickTimerPreset.OutsideTime -> "outside"
+        QuickTimerPreset.FreePlay -> "freePlay"
+        QuickTimerPreset.SnackTime -> "snack"
+    }
 
 @Composable
 private fun trafficColourWord(progress: Double): String =
@@ -339,6 +442,9 @@ private fun ActivityColor.toColor(): Color =
             ActivityColor.Teal -> teal
             ActivityColor.Purple -> purple
             ActivityColor.Indigo -> indigo
+            ActivityColor.Magenta -> magenta
+            ActivityColor.Sky -> sky
+            ActivityColor.Brown -> brown
         }
     }
 

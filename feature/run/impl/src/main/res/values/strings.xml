@@ -8,6 +8,8 @@
     <string name="run_all_done_tap">All done! Tap what comes next.</string>
     <string name="run_all_done_grown_up">All done! Your grown-up will help.</string>
 
+    <string name="run_all_done_back_to">All done! Back to %1$s in a moment.</string>
+
     <string name="sheet_say_together">Say together</string>
     <string name="sheet_say_active">We are %1$s. The big circle is getting smaller and the screen is %2$s. When it is red, we are out of time.</string>
     <string name="sheet_say_transition">It is red. We are out of time. Now it is %1$s.</string>
@@ -28,5 +30,14 @@
     <string name="sheet_start_next">Start %1$s</string>
     <string name="sheet_more_time">More time on this activity</string>
     <string name="sheet_more_minutes">+%1$d min</string>
+    <string name="sheet_back_to_now">Back to %1$s now</string>
+    <string name="sheet_something_else">Something else now</string>
+    <string name="sheet_else_minutes">%1$d</string>
+    <string name="sheet_else_minutes_heading">Minutes</string>
+    <string name="sheet_else_start">Start</string>
+    <string name="preset_playground">Playground</string>
+    <string name="preset_outside">Outside time</string>
+    <string name="preset_free_play">Free play</string>
+    <string name="preset_snack">Snack time</string>
     <string name="sheet_close">Close</string>
 </resources>

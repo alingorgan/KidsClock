@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kidsclock.core.model.Clock
 import com.kidsclock.core.model.routine.DEFAULT_EVENING_ROUTINE
+import com.kidsclock.core.model.routine.QuickTimerPreset
 import com.kidsclock.core.model.routine.Routine
 import com.kidsclock.core.model.run.Effect
 import com.kidsclock.core.model.run.Event
@@ -34,6 +35,8 @@ class RunViewModel(
 ) : ViewModel() {
     private var runState: RunState = initialRunState(initialRoutine, clock.elapsedRealtimeMillis())
     private var sheetOpen = false
+    private var elsePreset: QuickTimerPreset? = null
+    private var elseMinutes: Int? = null
 
     private val _uiState = MutableStateFlow(runState.toUiState(clock.elapsedRealtimeMillis()))
     val uiState: StateFlow<RunUiState> = _uiState.asStateFlow()
@@ -56,6 +59,7 @@ class RunViewModel(
 
     fun onSheetClosed() {
         sheetOpen = false
+        clearElseSelection()
         publish(clock.elapsedRealtimeMillis())
     }
 
@@ -68,12 +72,38 @@ class RunViewModel(
     /** The grown-up starts the next activity; the sheet closes so the child's screen is back. */
     fun onStartNext() {
         sheetOpen = false
+        clearElseSelection()
         dispatch(Event.GrownUpStartNext)
     }
 
     fun onMoreTime(minutes: Int) {
         sheetOpen = false
+        clearElseSelection()
         dispatch(Event.AddTime(minutes))
+    }
+
+    fun onSelectPreset(preset: QuickTimerPreset) {
+        elsePreset = preset
+        publish(clock.elapsedRealtimeMillis())
+    }
+
+    fun onSelectMinutes(minutes: Int) {
+        elseMinutes = minutes
+        publish(clock.elapsedRealtimeMillis())
+    }
+
+    /** "Something else now": needs both a preset and minutes; the sheet closes so the child's screen is back. */
+    fun onStartElse() {
+        val preset = elsePreset ?: return
+        val minutes = elseMinutes ?: return
+        sheetOpen = false
+        clearElseSelection()
+        dispatch(Event.StartQuickTimer(preset, minutes))
+    }
+
+    private fun clearElseSelection() {
+        elsePreset = null
+        elseMinutes = null
     }
 
     private fun startTicking() {
@@ -101,7 +131,7 @@ class RunViewModel(
     }
 
     private fun publish(now: Long) {
-        _uiState.value = runState.toUiState(now, sheetOpen)
+        _uiState.value = runState.toUiState(now, sheetOpen, elsePreset, elseMinutes)
     }
 
     private fun HintKind.toHint(): Hint =

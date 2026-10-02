@@ -8,4 +8,9 @@ enum class ActivityColor {
     Teal,
     Purple,
     Indigo,
+
+    /** Quick-timer presets only (SPEC §10); placeholders until the pictograms land. */
+    Magenta,
+    Sky,
+    Brown,
 }

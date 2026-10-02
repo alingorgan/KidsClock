@@ -41,5 +41,11 @@ val DEFAULT_EVENING_ROUTINE =
                     "reading a story",
                 ),
             ),
-        final = FinalActivity(name = "Sleep time", prompt = "Goodnight", startPolicy = StartPolicy.GrownUpOnly),
+        final =
+            FinalActivity(
+                name = "Sleep time",
+                prompt = "Goodnight",
+                startPolicy = StartPolicy.GrownUpOnly,
+                fadesToDark = true,
+            ),
     )

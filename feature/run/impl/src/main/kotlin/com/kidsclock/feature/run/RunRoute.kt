@@ -51,6 +51,9 @@ fun RunRoute(
                 onUnlockNext = viewModel::onUnlockNext,
                 onStartNext = viewModel::onStartNext,
                 onMoreTime = viewModel::onMoreTime,
+                onSelectPreset = viewModel::onSelectPreset,
+                onSelectMinutes = viewModel::onSelectMinutes,
+                onStartElse = viewModel::onStartElse,
             )
         }
     RunScreen(uiState = uiState, actions = actions, modifier = modifier, hint = hint)

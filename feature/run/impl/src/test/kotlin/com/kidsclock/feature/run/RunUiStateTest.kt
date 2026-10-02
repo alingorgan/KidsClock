@@ -3,8 +3,10 @@ package com.kidsclock.feature.run
 import com.kidsclock.core.model.routine.Activity
 import com.kidsclock.core.model.routine.ActivityColor
 import com.kidsclock.core.model.routine.FinalActivity
+import com.kidsclock.core.model.routine.QuickTimerPreset
 import com.kidsclock.core.model.routine.Routine
 import com.kidsclock.core.model.routine.StartPolicy
+import com.kidsclock.core.model.run.QuickTimer
 import com.kidsclock.core.model.run.RunState
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -122,5 +124,108 @@ class RunUiStateTest {
     @Test
     fun theSheetFlagPassesThroughWhileRunning() {
         assertEquals(true, running(RunState.Active(routine(), 0, 0L), now = 0L, sheetOpen = true).sheetOpen)
+    }
+
+    private val playground = QuickTimerPreset.Playground.toActivity(5)
+
+    private fun quickState(interrupted: RunState.Active? = null) =
+        RunState.Active(
+            routine(),
+            0,
+            startedAtElapsed = 2 * minute,
+            quickTimer = QuickTimer(playground, interrupted),
+        )
+
+    private fun interruptedAt2Min() = RunState.Active(routine(), 0, 0L, pausedAtElapsed = 2 * minute)
+
+    @Test
+    fun aQuickTimerShowsItsOwnNameAndPhraseAndColour() {
+        val ui = running(quickState(interruptedAt2Min()), now = 2 * minute)
+
+        assertEquals("Playground", ui.activityName)
+        assertEquals("at the playground", ui.activityDoing)
+        assertEquals(ActivityColor.Magenta, ui.activityColor)
+        assertEquals(5, ui.minutesLeft)
+    }
+
+    @Test
+    fun whileAQuickTimerRunsTheNextTileIsTheInterruptedActivity() {
+        val ui = running(quickState(interruptedAt2Min()), now = 3 * minute)
+
+        assertEquals("Playtime", ui.nextActivityName)
+        assertEquals(ActivityColor.Amber, ui.nextActivityColor)
+        assertEquals(true, ui.nextIsInterrupted)
+    }
+
+    @Test
+    fun aQuickTimerStartedFromTransitionKeepsTheRoutinesNextOnTheTile() {
+        val ui = running(quickState(interrupted = null), now = 3 * minute)
+
+        assertEquals("Tidy up", ui.nextActivityName)
+        assertEquals(false, ui.nextIsInterrupted)
+    }
+
+    @Test
+    fun somethingElseIsNotOfferedWhileAQuickTimerRunsOrWaits() {
+        val plain = running(RunState.Active(routine(), 0, 0L), now = 0L)
+        val quick = running(quickState(interruptedAt2Min()), now = 3 * minute)
+        val waiting = running(waitingState(), now = 8 * minute)
+
+        assertEquals(true, plain.canStartElse)
+        assertEquals(false, quick.canStartElse)
+        assertEquals(false, waiting.canStartElse)
+        assertEquals(true, running(RunState.Transition(routine(), 0), now = 0L).canStartElse)
+    }
+
+    private fun waitingState() =
+        RunState.Transition(
+            routine(secondPolicy = StartPolicy.GrownUpOnly),
+            0,
+            startedAtElapsed = 2 * minute,
+            quickTimer = QuickTimer(playground, interruptedAt2Min()),
+            resumeAtElapsed = 7 * minute + 5_000,
+        )
+
+    @Test
+    fun theWaitIsRedWithNoGatePulseAndNoChildStart() {
+        val ui = running(waitingState(), now = 7 * minute)
+
+        assertEquals(Phase.Transition, ui.phase)
+        assertEquals(true, ui.autoResuming)
+        assertEquals(false, ui.childCanStart)
+        assertEquals(false, ui.grownUpNeeded)
+        assertEquals(false, ui.canUnlockNext)
+        assertEquals("Playtime", ui.nextActivityName)
+        assertEquals(true, ui.nextIsInterrupted)
+    }
+
+    @Test
+    fun anOrdinaryLockedTransitionStillPulsesTheGate() {
+        val ui = running(RunState.Transition(routine(secondPolicy = StartPolicy.GrownUpOnly), 0), now = 0L)
+
+        assertEquals(false, ui.autoResuming)
+        assertEquals(true, ui.grownUpNeeded)
+    }
+
+    @Test
+    fun theSelectionIsPassedThrough() {
+        val ui =
+            RunState.Active(routine(), 0, 0L).toUiState(
+                now = 0L,
+                sheetOpen = true,
+                elsePreset = QuickTimerPreset.SnackTime,
+                elseMinutes = 10,
+            ) as RunUiState.Running
+
+        assertEquals(QuickTimerPreset.SnackTime, ui.elsePreset)
+        assertEquals(10, ui.elseMinutes)
+    }
+
+    @Test
+    fun finalFadesOnlyWhenTheFinalItemSaysSo() {
+        val fading = Routine(routine().activities, FinalActivity("Sleep time", "Goodnight", fadesToDark = true))
+
+        assertEquals(true, (RunState.Final(fading).toUiState(0L) as RunUiState.Final).fadesToDark)
+        assertEquals(false, (RunState.Final(routine()).toUiState(0L) as RunUiState.Final).fadesToDark)
     }
 }

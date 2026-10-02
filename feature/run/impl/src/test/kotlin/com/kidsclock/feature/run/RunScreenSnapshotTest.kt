@@ -5,7 +5,9 @@ import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.kidsclock.core.designsystem.KidsClockTheme
+import com.kidsclock.core.designsystem.components.KC_FADE_MILLIS
 import com.kidsclock.core.model.routine.ActivityColor
+import com.kidsclock.core.model.routine.QuickTimerPreset
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -177,5 +179,78 @@ class RunScreenSnapshotTest {
             KidsClockTheme(darkTheme = false) { RunScreen(uiState = lockedTransition, actions = RunActions.None) }
         }
         compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_transition_locked_light.png")
+    }
+
+    private val sheetElse =
+        running.copy(
+            sheetOpen = true,
+            minutesLeft = 6,
+            canStartElse = true,
+            elsePreset = QuickTimerPreset.OutsideTime,
+            elseMinutes = 15,
+        )
+    private val quickRunning =
+        running.copy(
+            activityName = "Playground",
+            activityDoing = "at the playground",
+            activityColor = ActivityColor.Magenta,
+            nextActivityName = "Playtime",
+            nextActivityColor = ActivityColor.Amber,
+            nextIsInterrupted = true,
+        )
+    private val autoResuming =
+        quickRunning.copy(progress = 1.0, phase = Phase.Transition, autoResuming = true)
+
+    @Test
+    fun sheet_else_light() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) { RunScreen(uiState = sheetElse, actions = RunActions.None) }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_sheet_else_light.png")
+    }
+
+    @Test
+    fun sheet_else_dark() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = true) { RunScreen(uiState = sheetElse, actions = RunActions.None) }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_sheet_else_dark.png")
+    }
+
+    @Test
+    fun sheet_quickTimer_light() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) {
+                RunScreen(uiState = quickRunning.copy(sheetOpen = true), actions = RunActions.None)
+            }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_sheet_quickTimer_light.png")
+    }
+
+    @Test
+    fun quickTimer_light() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) { RunScreen(uiState = quickRunning, actions = RunActions.None) }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_quickTimer_light.png")
+    }
+
+    @Test
+    fun quickTimer_autoResuming_light() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) { RunScreen(uiState = autoResuming, actions = RunActions.None) }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_quickTimer_autoResuming_light.png")
+    }
+
+    @Test
+    fun final_faded() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) {
+                RunScreen(uiState = final.copy(fadesToDark = true), actions = RunActions.None)
+            }
+        }
+        compose.mainClock.advanceTimeBy(KC_FADE_MILLIS + 1_000L)
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_final_faded.png")
     }
 }

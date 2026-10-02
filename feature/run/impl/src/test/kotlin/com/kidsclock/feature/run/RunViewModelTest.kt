@@ -5,6 +5,7 @@ import com.kidsclock.core.model.FakeClock
 import com.kidsclock.core.model.routine.Activity
 import com.kidsclock.core.model.routine.ActivityColor
 import com.kidsclock.core.model.routine.FinalActivity
+import com.kidsclock.core.model.routine.QuickTimerPreset
 import com.kidsclock.core.model.routine.Routine
 import com.kidsclock.core.model.routine.StartPolicy
 import kotlinx.coroutines.Dispatchers
@@ -255,6 +256,77 @@ class RunViewModelTest {
             assertEquals(Phase.Active, runningState(viewModel).phase)
             assertEquals(8.0 / 13.0, runningState(viewModel).progress, 1e-9)
             assertEquals(false, viewModel.uiState.value.sheetOpen)
+
+            stopTicking(viewModel)
+        }
+
+    @Test
+    fun somethingElseNeedsBothAPresetAndMinutes() =
+        runTest {
+            val viewModel = RunViewModel(FakeClock(0L), shortRoutine())
+            mainDispatcher.scheduler.runCurrent()
+
+            viewModel.onSelectPreset(QuickTimerPreset.Playground)
+            viewModel.onStartElse()
+
+            assertEquals("First", assertIs<RunUiState.Running>(viewModel.uiState.value).activityName)
+
+            stopTicking(viewModel)
+        }
+
+    @Test
+    fun somethingElseStartsAQuickTimerThatBringsTheActivityBackBySelf() =
+        runTest {
+            val clock = FakeClock(0L)
+            val viewModel = RunViewModel(clock, shortRoutine(firstDurationMillis = 60_000L))
+            mainDispatcher.scheduler.runCurrent()
+            clock.set(10_000L)
+            viewModel.onGateOpened()
+            viewModel.onSelectPreset(QuickTimerPreset.SnackTime)
+            viewModel.onSelectMinutes(5)
+            assertEquals(QuickTimerPreset.SnackTime, assertIs<RunUiState.Running>(viewModel.uiState.value).elsePreset)
+
+            viewModel.onStartElse()
+
+            val quick = assertIs<RunUiState.Running>(viewModel.uiState.value)
+            assertEquals("Snack time", quick.activityName)
+            assertEquals("First", quick.nextActivityName)
+            assertEquals(false, quick.sheetOpen)
+            assertEquals(null, quick.elsePreset)
+
+            clock.set(10_000L + 5 * 60_000L)
+            mainDispatcher.scheduler.advanceTimeBy(200L)
+            mainDispatcher.scheduler.runCurrent()
+            val red = assertIs<RunUiState.Running>(viewModel.uiState.value)
+            assertEquals(true, red.autoResuming)
+            assertEquals(RunEffect.PlayChime, viewModel.effects.first())
+
+            clock.set(10_000L + 5 * 60_000L + 5_000L)
+            mainDispatcher.scheduler.advanceTimeBy(200L)
+            mainDispatcher.scheduler.runCurrent()
+            val back = assertIs<RunUiState.Running>(viewModel.uiState.value)
+            assertEquals("First", back.activityName)
+            assertEquals(Phase.Active, back.phase)
+            assertEquals(false, back.paused)
+            assertEquals(10_000.0 / 60_000.0, back.progress, 1e-9)
+
+            stopTicking(viewModel)
+        }
+
+    @Test
+    fun closingTheSheetForgetsTheSelection() =
+        runTest {
+            val viewModel = RunViewModel(FakeClock(0L), shortRoutine())
+            mainDispatcher.scheduler.runCurrent()
+            viewModel.onGateOpened()
+            viewModel.onSelectPreset(QuickTimerPreset.FreePlay)
+            viewModel.onSelectMinutes(15)
+
+            viewModel.onSheetClosed()
+
+            val state = assertIs<RunUiState.Running>(viewModel.uiState.value)
+            assertEquals(null, state.elsePreset)
+            assertEquals(null, state.elseMinutes)
 
             stopTicking(viewModel)
         }

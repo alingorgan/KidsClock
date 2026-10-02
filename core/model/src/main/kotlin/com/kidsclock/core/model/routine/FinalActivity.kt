@@ -5,4 +5,6 @@ data class FinalActivity(
     val name: String,
     val prompt: String,
     val startPolicy: StartPolicy = StartPolicy.ChildTaps,
+    /** Decision 23: entering this item fades the whole screen to near-black, with no chime. */
+    val fadesToDark: Boolean = false,
 )

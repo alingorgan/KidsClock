@@ -1,5 +1,6 @@
 package com.kidsclock.core.model.run
 
+import com.kidsclock.core.model.routine.Activity
 import com.kidsclock.core.model.routine.Routine
 import com.kidsclock.core.model.routine.StartPolicy
 
@@ -19,10 +20,15 @@ sealed interface RunState {
         val pausedAtElapsed: Long? = null,
         /** Minutes added with "More time" (SPEC §10, decision 26), in milliseconds. */
         val extraMillis: Long = 0,
+        /** SPEC §10: set while a "Something else now" timer runs in place of routine item [index]. */
+        val quickTimer: QuickTimer? = null,
     ) : RunState {
+        /** What is on screen: the quick timer's activity, else routine item [index]. */
+        val activity: Activity get() = quickTimer?.activity ?: routine.activities[index]
+
         val isPaused: Boolean get() = pausedAtElapsed != null
 
-        fun totalMillis(): Long = routine.activities[index].durationMillis + extraMillis
+        fun totalMillis(): Long = activity.durationMillis + extraMillis
 
         /** The moment the activity would have started had it never been paused: elapsed = now - this. */
         private fun effectiveStart(now: Long): Long =
@@ -41,12 +47,38 @@ sealed interface RunState {
         val pausedTotalMillis: Long = 0,
         val extraMillis: Long = 0,
         val unlocked: Boolean = false,
-    ) : RunState
+        val quickTimer: QuickTimer? = null,
+        /** SPEC §10, decision 27: when the interrupted activity comes back by itself; null if none to resume. */
+        val resumeAtElapsed: Long? = null,
+    ) : RunState {
+        val activity: Activity get() = quickTimer?.activity ?: routine.activities[index]
+
+        /** The red screen after a quick timer that interrupted an activity: waiting to hand back (SPEC §10). */
+        val isAutoResuming: Boolean get() = resumeAtElapsed != null
+    }
 
     data class Final(
         override val routine: Routine,
     ) : RunState
 }
+
+/**
+ * A "Something else now" timer (SPEC §10). [interrupted] is the routine activity it paused (null when it
+ * started from `transition`, where nothing is left to resume). The routine itself is never mutated.
+ */
+data class QuickTimer(
+    val activity: Activity,
+    val interrupted: RunState.Active?,
+)
+
+/** The routine activity that comes back after a quick timer, if one was interrupted. */
+val RunState.interruptedActivity: Activity?
+    get() =
+        when (this) {
+            is RunState.Active -> quickTimer?.interrupted?.activity
+            is RunState.Transition -> quickTimer?.interrupted?.activity
+            is RunState.Final -> null
+        }
 
 /** The policy for starting whatever comes after [index] (the next activity, or the final item). */
 fun Routine.nextStartPolicy(index: Int): StartPolicy = activities.getOrNull(index + 1)?.startPolicy ?: final.startPolicy
