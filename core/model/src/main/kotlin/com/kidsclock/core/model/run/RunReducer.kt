@@ -78,7 +78,7 @@ object RunReducer {
                 }
             Event.UnlockNext -> ReduceResult(if (state.isAutoResuming) state else state.copy(unlocked = true))
             Event.GrownUpStartNext -> ReduceResult(startNext(state, now))
-            is Event.AddTime -> ReduceResult(state.toActive(event.minutes))
+            is Event.AddTime -> ReduceResult(state.toActive(event.minutes, now))
             is Event.StartQuickTimer -> ReduceResult(startQuickTimer(state, event, now))
         }
 
@@ -100,7 +100,7 @@ object RunReducer {
         now: Long,
     ): RunState {
         if (event.minutes !in QUICK_TIMER_MINUTES) return state
-        val activity = event.preset.toActivity(event.minutes)
+        val activity = event.preset.toActivity(event.minutes, state.routine.minuteMillis)
         return when (state) {
             is RunState.Active ->
                 if (state.quickTimer != null) {
@@ -140,26 +140,33 @@ object RunReducer {
         if (minutes in
             MORE_TIME_MINUTES
         ) {
-            state.copy(extraMillis = state.extraMillis + minutes * MINUTE_MILLIS)
+            state.copy(extraMillis = state.extraMillis + minutes * state.routine.minuteMillis)
         } else {
             state
         }
 
-    /** SPEC §10: from the red screen, "More time" returns the activity to `active` against the longer total. */
-    private fun RunState.Transition.toActive(minutes: Int): RunState =
-        if (minutes in MORE_TIME_MINUTES) {
-            RunState.Active(
-                routine,
-                index,
-                startedAtElapsed,
-                pausedTotalMillis,
-                null,
-                extraMillis + minutes * MINUTE_MILLIS,
-                quickTimer,
-            )
-        } else {
-            this
-        }
+    /**
+     * SPEC §10: from the red screen, "More time" returns the activity to `active` against the longer total.
+     * The time already spent on the red screen does not count against the extra minutes, so progress drops
+     * back to where it was when the time ran out (8 min + 5 min is about 62%), however long the red lasted.
+     */
+    private fun RunState.Transition.toActive(
+        minutes: Int,
+        now: Long,
+    ): RunState {
+        if (minutes !in MORE_TIME_MINUTES) return this
+        val endedAt = startedAtElapsed + pausedTotalMillis + activity.durationMillis + extraMillis
+        val redMillis = (now - endedAt).coerceAtLeast(0L)
+        return RunState.Active(
+            routine,
+            index,
+            startedAtElapsed,
+            pausedTotalMillis + redMillis,
+            null,
+            extraMillis + minutes * routine.minuteMillis,
+            quickTimer,
+        )
+    }
 
     /** The next activity, or the final item. For the last item (OPEN_QUESTIONS #4) nothing else happens here. */
     private fun startNext(
@@ -188,6 +195,5 @@ object RunReducer {
         }
     }
 
-    private const val MINUTE_MILLIS = 60_000L
     private const val AUTO_RESUME_MILLIS = 5_000L
 }

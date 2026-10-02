@@ -68,7 +68,7 @@ fun RunState.toUiState(
         is RunState.Active ->
             running(this, activity, Phase.Active, progress(now), sheetOpen).copy(
                 paused = isPaused,
-                minutesLeft = ((remainingMillis(now) + MINUTE_MILLIS - 1) / MINUTE_MILLIS).toInt(),
+                minutesLeft = ((remainingMillis(now) + routine.minuteMillis - 1) / routine.minuteMillis).toInt(),
                 canStartElse = quickTimer == null,
                 elsePreset = elsePreset,
                 elseMinutes = elseMinutes,
@@ -121,5 +121,3 @@ private fun running(
         sheetOpen = sheetOpen,
     )
 }
-
-private const val MINUTE_MILLIS = 60_000L

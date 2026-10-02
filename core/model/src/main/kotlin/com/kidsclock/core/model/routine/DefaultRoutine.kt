@@ -1,17 +1,15 @@
 package com.kidsclock.core.model.routine
 
-import kotlin.time.Duration.Companion.minutes
-
 /** SPEC §12's hardcoded evening routine with SPEC §8's demo start policies. No setup UI yet. */
-val DEFAULT_EVENING_ROUTINE =
+fun eveningRoutine(minuteMillis: Long = REAL_MINUTE_MILLIS): Routine =
     Routine(
         activities =
             listOf(
-                Activity("playtime", "Playtime", 8.minutes.inWholeMilliseconds, ActivityColor.Amber, doing = "playing"),
+                Activity("playtime", "Playtime", 8 * minuteMillis, ActivityColor.Amber, doing = "playing"),
                 Activity(
                     "tidy-up",
                     "Tidy up",
-                    3.minutes.inWholeMilliseconds,
+                    3 * minuteMillis,
                     ActivityColor.Green,
                     StartPolicy.ChildTaps,
                     "tidying up",
@@ -19,7 +17,7 @@ val DEFAULT_EVENING_ROUTINE =
                 Activity(
                     "bath-time",
                     "Bath time",
-                    10.minutes.inWholeMilliseconds,
+                    10 * minuteMillis,
                     ActivityColor.Blue,
                     StartPolicy.GrownUpUnlocksThenChildTaps,
                     "having a bath",
@@ -27,7 +25,7 @@ val DEFAULT_EVENING_ROUTINE =
                 Activity(
                     "brush-teeth",
                     "Brush teeth",
-                    3.minutes.inWholeMilliseconds,
+                    3 * minuteMillis,
                     ActivityColor.Teal,
                     StartPolicy.ChildTaps,
                     "brushing teeth",
@@ -35,7 +33,7 @@ val DEFAULT_EVENING_ROUTINE =
                 Activity(
                     "story-time",
                     "Story time",
-                    8.minutes.inWholeMilliseconds,
+                    8 * minuteMillis,
                     ActivityColor.Purple,
                     StartPolicy.GrownUpOnly,
                     "reading a story",
@@ -48,4 +46,7 @@ val DEFAULT_EVENING_ROUTINE =
                 startPolicy = StartPolicy.GrownUpOnly,
                 fadesToDark = true,
             ),
+        minuteMillis = minuteMillis,
     )
+
+val DEFAULT_EVENING_ROUTINE = eveningRoutine()

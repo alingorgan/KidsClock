@@ -6,6 +6,7 @@ import com.kidsclock.core.model.routine.FinalActivity
 import com.kidsclock.core.model.routine.QuickTimerPreset
 import com.kidsclock.core.model.routine.Routine
 import com.kidsclock.core.model.routine.StartPolicy
+import com.kidsclock.core.model.routine.eveningRoutine
 import com.kidsclock.core.model.run.QuickTimer
 import com.kidsclock.core.model.run.RunState
 import org.junit.jupiter.api.Test
@@ -227,5 +228,14 @@ class RunUiStateTest {
 
         assertEquals(true, (RunState.Final(fading).toUiState(0L) as RunUiState.Final).fadesToDark)
         assertEquals(false, (RunState.Final(routine()).toUiState(0L) as RunUiState.Final).fadesToDark)
+    }
+
+    @Test
+    fun minutesLeftFollowsTheRoutinesMinuteLength() {
+        val fast = eveningRoutine(minuteMillis = 1_000L)
+        val state = RunState.Active(fast, 0, startedAtElapsed = 0L)
+
+        assertEquals(8, running(state, now = 0L).minutesLeft)
+        assertEquals(7, running(state, now = 1_000L).minutesLeft)
     }
 }

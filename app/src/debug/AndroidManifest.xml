@@ -14,6 +14,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Debug-only "fast mode" (testing): same app, but a minute lasts one second. -->
+        <activity-alias
+            android:name=".FastModeLauncher"
+            android:exported="true"
+            android:label="KidsClock fast"
+            android:targetActivity=".MainActivity"
+            tools:ignore="HardcodedText">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
     </application>
 
 </manifest>

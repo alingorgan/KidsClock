@@ -1,5 +1,6 @@
 package com.kidsclock.core.model.run
 
+import com.kidsclock.core.model.routine.QuickTimerPreset
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -113,5 +114,35 @@ class Spec10_MoreTimeTest {
 
         assertEquals(3 * minute, back.pausedTotalMillis)
         assertEquals(8.0 / 13.0, back.progress(now = 11 * minute), 1e-9)
+    }
+
+    @Test
+    fun Spec10_MoreTime_fromRedAfterALongWaitStillGivesTheFullExtraTime() {
+        val transition = RunState.Transition(routine, index = 0, startedAtElapsed = 0L)
+        val now = 30 * minute // red since minute 8: a long dwell, longer than the 5 extra minutes
+
+        val back = reduce(transition, Event.AddTime(5), now).state as RunState.Active
+
+        assertEquals(8.0 / 13.0, back.progress(now), 1e-9)
+        assertEquals(5 * minute, back.remainingMillis(now))
+        assertEquals(emptyList(), reduce(back, Event.Tick(now), now).effects)
+        assertEquals(emptyList(), reduce(back, Event.Tick(now + 5 * minute - 1), now + 5 * minute - 1).effects)
+        assertEquals(listOf(Effect.PlayChime), reduce(back, Event.Tick(now + 5 * minute), now + 5 * minute).effects)
+    }
+
+    @Test
+    fun Spec10_MoreTime_fromRedOnAQuickTimerAfterALongWaitToo() {
+        val quick =
+            RunState.Transition(
+                routine,
+                index = 0,
+                startedAtElapsed = 10 * minute,
+                quickTimer = QuickTimer(QuickTimerPreset.Playground.toActivity(5), null),
+            )
+        val now = 40 * minute // quick timer ended at minute 15
+
+        val back = reduce(quick, Event.AddTime(5), now).state as RunState.Active
+
+        assertEquals(5 * minute, back.remainingMillis(now))
     }
 }

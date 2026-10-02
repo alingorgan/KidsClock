@@ -4,8 +4,16 @@ package com.kidsclock.core.model.routine
 data class Routine(
     val activities: List<Activity>,
     val final: FinalActivity,
+    /** How long a "minute" lasts: [REAL_MINUTE_MILLIS] always, except in the debug-only fast mode. */
+    val minuteMillis: Long = REAL_MINUTE_MILLIS,
 ) {
     init {
         require(activities.isNotEmpty()) { "Routine must have at least one activity" }
+        require(minuteMillis > 0) { "A minute must last longer than zero" }
     }
 }
+
+const val REAL_MINUTE_MILLIS = 60_000L
+
+/** Debug-only fast mode (testing): minutes last one second. Never offered in release builds. */
+const val FAST_MINUTE_MILLIS = 1_000L

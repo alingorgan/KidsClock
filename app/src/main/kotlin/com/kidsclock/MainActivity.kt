@@ -9,7 +9,10 @@ import com.kidsclock.core.designsystem.KidsClockTheme
 import com.kidsclock.feature.run.RunRoute
 
 class MainActivity : ComponentActivity() {
-    private val appContainer by lazy { AppContainer(applicationContext) }
+    private val appContainer by lazy { AppContainer(applicationContext, fastMode = isFastModeLaunch()) }
+
+    /** The "KidsClock fast" launcher exists only in the debug manifest, so release builds are never fast. */
+    private fun isFastModeLaunch() = intent?.component?.className == FAST_ALIAS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,3 +28,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+private const val FAST_ALIAS = "com.kidsclock.FastModeLauncher"

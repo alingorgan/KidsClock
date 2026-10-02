@@ -13,11 +13,14 @@ enum class QuickTimerPreset(
     SnackTime("Snack time", "having a snack", ActivityColor.Brown),
     ;
 
-    fun toActivity(minutes: Int): Activity =
+    fun toActivity(
+        minutes: Int,
+        minuteMillis: Long = REAL_MINUTE_MILLIS,
+    ): Activity =
         Activity(
             id = "quick-$name",
             name = activityName,
-            durationMillis = minutes * 60_000L,
+            durationMillis = minutes * minuteMillis,
             color = color,
             doing = doing,
         )
