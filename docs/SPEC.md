@@ -29,7 +29,7 @@ Photos/clips stay stored but unused for "Under 3".
 ## 5. Activity phases
 - `active`: timer running (or paused by the caregiver).
 - `transition`: time is up. Progress bubble fully shrunk, screen red, chime plays. Waiting for the handover to the next activity.
-- `final`: the last item. No timer, no progress bubble. Shows its own word and prompt (e.g. "Goodnight", or "All done!").
+- `final`: the last item. No timer, no progress bubble. Shows its own word and prompt (e.g. "Goodnight", or "All done!"). No chime. "Sleep time" fades slowly to dark, starting immediately when it appears over 5 seconds (decision 23).
 
 Progress = elapsed ÷ duration, from 0 to 1. Reaching 1 enters `transition`.
 
@@ -74,11 +74,12 @@ Default demo policies: Playtime first; Tidy up = child taps; Bath = unlock; Teet
 
 ## 10. Quick timer (ad-hoc time)
 For moments with no routine or a change of plan (e.g. the playground).
-- **More time on this activity**: "5 / 10 / 15 more min". Inserts a copy of the current activity (same picture, colour, photo, clip) for that many minutes and starts it. When it ends, the routine continues with what was next.
+- **More time on this activity** (caregiver only, decision 26): "5 / 10 / 15 more min". Extends the current activity by that long; nothing is inserted and nothing is paused. Available before the activity ends and after it has ended (from `transition`, it returns the activity to `active`). Progress is measured against the new, longer total, so it drops back (8 min + 5 min is at about 62%, amber). This replaces the separate grace period (decision 24).
 - **Something else now**: preset activity + minutes (5, 10, 15, 20, 30) + Start. Presets: Playground, Outside time, Free play, Snack time. Inserted after the current activity; the routine continues after it.
 - **Quick timer only** (from setup, no routine): choose activity + minutes; runs that one timer, then an "All done!" screen with a check mark that the child can tap.
 - Quick-timer entries are temporary; going back to setup or restarting removes them.
-- The interrupted activity is *not* resumed afterwards (open question, see `OPEN_QUESTIONS.md`).
+- **Interruption pauses, not consumes (decision 20):** "Something else now" pauses the interrupted activity with its remaining time, and when the quick timer ends the chime plays and the screen goes red (`transition`), then the interrupted activity auto-resumes after 5 seconds with no interaction (decision 27); the routine then continues as before. No nested interruptions. An activity already in `transition` is not paused. 
+- Quick timers are presets only (no custom name or photo, decision 21) and do not add dots to the day strip (decision 22).
 
 ## 11. Photo and clip (3 and over)
 - Tapping the activity bubble opens the photo enlarged (the circle grows to a rounded card over the screen). If a clip exists it plays there. It closes by itself: photo after about 6 s, clip when it ends. Tapping closes it early.

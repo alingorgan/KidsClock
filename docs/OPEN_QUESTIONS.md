@@ -3,12 +3,37 @@
 Do not guess these in code. Ask the owner, or make them configurable and log the choice.
 
 ## Product
-1. **Interrupted activities.** Starting a quick timer mid-activity uses up the current activity; it does not resume afterwards. Should the interrupted activity resume with its remaining time?
-2. **Custom quick timers.** Presets only today. Want a custom name and an on-the-spot photo?
-3. **Ad-hoc dots in the day strip.** Each extension adds a dot; they crowd the strip. Hide ad-hoc dots?
-4. **Final activity signal.** Should "Sleep time" get a different ending (slow fade to dark, no chime) instead of the standard treatment?
-5. **Grace period.** When the screen turns red, can the caregiver add a short grace period, or is red always "move on now"?
-6. **Persistence.** Should photos, clips and the routine persist between sessions? (Assumed yes on native.)
+Questions 1-6 were answered by the owner on 2026-10-02 (recorded as decisions 20-25 in
+`DECISIONS.md`). The follow-ups below are what those answers left open.
+
+1. ~~**Interrupted activities.**~~ Resolved: the interrupted activity is paused and resumes after the new one finishes (decision 20).
+2. ~~**Custom quick timers.**~~ Resolved: presets only, no custom name or photo (decision 21).
+3. ~~**Ad-hoc dots in the day strip.**~~ Resolved: hide them (decision 22).
+4. ~~**Final activity signal.**~~ Resolved: no chime when "Sleep time" is reached (decision 23).
+5. ~~**Grace period.**~~ Resolved: the caregiver can optionally add one (decision 24).
+6. ~~**Persistence.**~~ Resolved: yes (decision 25).
+
+### Follow-ups (answered 2026-10-02 unless marked open)
+- ~~**1a. Resume vs. skip.**~~ The interrupted activity **auto-resumes** when the quick timer ends; the routine then proceeds as before (decision 20). No caregiver choice.
+- ~~**1b. "More time".**~~ Just extends the current activity. Caregiver-only (decision 26).
+- ~~**1c. Interrupting an activity already in `transition`.**~~ Not paused; it hands over as usual. Confirmed "for now".
+- ~~**1d. Nested interruptions.**~~ Not allowed.
+- ~~**4a. Fade to dark.**~~ Yes: "Sleep time" fades slowly to dark, no chime (decision 23).
+- ~~**5a. Grace period.**~~ The caregiver chooses 1, 3, 5 or 10 minutes, "for now" (decision 24).
+- ~~**6a. Scope of persistence.**~~ Confirmed: routine, run anchor, later photos and clips (decision 25).
+
+### Answered after that (2026-10-02)
+- ~~**A. Quick-timer end.**~~ The chime plays and the screen goes red (`transition`); the interrupted activity then **auto-resumes after 5 seconds** with no interaction (decision 27).
+- ~~**B. Grace vs. "More time".**~~ One feature: "More time" only. The separate grace period is dropped (decision 24 superseded). It can be started before the activity ends and after it has ended (decision 26).
+- ~~**C/D. Fade to dark.**~~ Starts immediately when "Sleep time" appears (decision 23).
+
+### Answered last (2026-10-02)
+- ~~**E. "More time" durations.**~~ 5/10/15 min, for now.
+- ~~**F. Display after "More time" from red.**~~ Progress is measured against the new, longer total, so it drops back (an 8 min activity plus 5 min is at about 62%, amber).
+- ~~**G. Fade length.**~~ 5 seconds.
+- ~~**H. Auto-resume and handover policy.**~~ Confirmed: the auto-resumed activity skips the policy.
+
+No product questions from this round remain open.
 
 ## Design (to test with real children)
 7. Does the full-screen saturated red read as "we are done, something new is next", or as being told off? Watch for protest.

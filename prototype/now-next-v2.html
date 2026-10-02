@@ -68,7 +68,10 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
 .quick .sub{margin:0;font-size:.8rem;color:var(--ink2)}
 
 /* ---------- run ---------- */
-#run{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;--c:#D98214;background:color-mix(in srgb,var(--c) 11%,var(--stage));align-items:center;justify-content:center;gap:20px;padding:56px 16px 110px;transition:background 1.4s}
+#run{isolation:isolate;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;--c:#D98214;background:color-mix(in srgb,var(--c) 11%,var(--stage));align-items:center;justify-content:center;gap:20px;padding:56px 16px 110px;transition:background 1.4s}
+.fadeout{position:absolute;inset:0;z-index:-1;background:#05080b;opacity:0;pointer-events:none;transition:opacity 0s}
+#run.fade .fadeout{opacity:1;transition:opacity 5s linear}
+#run.fade .word{color:#e8eef2;transition:color 5s linear}
 .strip{position:absolute;top:18px;left:56px;right:16px;display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
 .pip{width:22px;height:22px;border-radius:50%;background:var(--pc);opacity:.28;display:grid;place-items:center;transition:opacity .6s,transform .6s}
 .pip svg{width:13px;height:13px}
@@ -138,7 +141,7 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
 .side label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--ink2)}
 .side .row{display:flex;gap:8px;flex-wrap:wrap}
 @media (max-width:440px){.phone{border-width:0;border-radius:0;height:calc(100vh - 20px)}}
-@media (prefers-reduced-motion:reduce){#run.winding .core,.next.go.tappable .bub{animation:none}.time,#run,.core,.zbox,.zoom,.sheet{transition:none}}
+@media (prefers-reduced-motion:reduce){#run.winding .core,.next.go.tappable .bub{animation:none}.time,#run,.core,.zbox,.zoom,.sheet,#run.fade .fadeout,#run.fade .word{transition:none}}
 </style>
 
 <div class="page">
@@ -176,6 +179,7 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
   <section class="screen" id="run" aria-label="Child display" hidden>
     <button class="gate" id="gate" type="button" aria-label="Grown-up controls: press and hold"><i></i>
       <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14"/></svg></button>
+    <div class="fadeout" id="fadeout"></div>
     <div class="strip" id="strip"></div>
     <div class="orb"><div class="time" id="time"></div><button class="core" id="core" type="button" aria-label="Look closer"></button></div>
     <p class="word" id="word" aria-live="polite"></p>
@@ -199,10 +203,10 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
       </div>
       <div class="quick" id="quick">
         <h2>Quick timer</h2>
-        <p class="sub">More time on this activity, then the routine carries on.</p>
+        <p class="sub">More time on this activity (from before it ends, or once it is red). Then the routine carries on.</p>
         <div class="r3"><button class="btn qmore" type="button" data-m="5">5 more min</button><button class="btn qmore" type="button" data-m="10">10 more min</button><button class="btn qmore" type="button" data-m="15">15 more min</button></div>
-        <p class="sub">Or start something else now.</p>
-        <div class="qnew"><select id="qAct" aria-label="Activity"></select><select id="qMin" aria-label="Minutes"></select><button class="btn" id="qGo" type="button">Start</button></div>
+        <div id="qelse"><p class="sub">Or start something else now. This activity pauses and picks up again afterwards.</p>
+        <div class="qnew"><select id="qAct" aria-label="Activity"></select><select id="qMin" aria-label="Minutes"></select><button class="btn" id="qGo" type="button">Start</button></div></div>
       </div>
       <button class="btn" id="bClose" type="button">Close</button>
     </div>
@@ -218,7 +222,9 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
       <li>Let the timer run out. Bath time waits for the grown-up to unlock it; story time can only be started from the sheet.</li>
       <li>Switch to "Under 3" in setup: only line pictures, and "next" stays hidden until the grown-up shows it.</li>
       <li>In setup, compare progress colours (whole screen, ring, none) and the end sound. Sound starts after your first tap.</li>
-      <li>Quick timer: press and hold the dot, then choose "5 more min" for the same activity, or start something new like Playground. In setup, "Quick timer" runs one with no routine.</li>
+      <li>Quick timer: press and hold the dot. "5 more min" extends this activity, before it ends or once it is red. "Something else now" (Playground, snack...) pauses this activity; when that timer ends the chime plays, the screen goes red, and 5 seconds later the paused activity picks up where it left off. In setup, "Quick timer" runs one with no routine.</li>
+      <li>Run the routine to the end: "Sleep time" has no chime, and the screen fades to dark over 5 seconds.</li>
+      <li>Your setup choices (minutes, who starts what, colour, sound, age) are remembered on this device. Photos are not.</li>
     </ul>
   </div>
   <div>
@@ -262,9 +268,9 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
     {k:'bath', label:'Bath time',  ing:'having a bath',  mins:10, c:'#2F86CC',pol:'unlock'},
     {k:'teeth',label:'Brush teeth',ing:'brushing teeth', mins:3,  c:'#1E9C96',pol:'tap'},
     {k:'story',label:'Story time', ing:'reading a story',mins:8,  c:'#8462C2',pol:'adult'},
-    {k:'sleep',label:'Sleep time', ing:'getting ready to sleep',mins:0,c:'#33448A',pol:'adult',final:true,finalWord:'Goodnight',finalSay:'The day is done. Time for sleep.',finalAsk:'Ask: "What was your favourite part of today?"'}
+    {k:'sleep',label:'Sleep time', ing:'getting ready to sleep',mins:0,c:'#33448A',pol:'adult',final:true,fade:true,finalWord:'Goodnight',finalSay:'The day is done. Time for sleep.',finalAsk:'Ask: "What was your favourite part of today?"'}
   ];
-  var S={idx:0,el:0,phase:'active',running:true,age:'older',speed:20,peek:false,chimed:false,armed:false,setup:true,saved:null,solo:false,tl:'screen',sound:'chime',warn:true,sndTimer:null};
+  var S={idx:0,el:0,phase:'active',running:true,age:'older',speed:20,peek:false,chimed:false,armed:false,setup:true,saved:null,solo:false,resume:null,transAt:0,tl:'screen',sound:'chime',warn:true,sndTimer:null};
   var $=function(id){return document.getElementById(id)};
 
   /* placeholder media so the flow can be seen */
@@ -279,7 +285,7 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
   R.forEach(function(r){if(!r.final){r.photo=samplePhoto(r);r.photoSample=true}});
   R[0].clip='sample';R[2].clip='sample';
 
-  function dur(i){return R[i].mins*60}
+  function dur(i){return R[i].mins*60+(R[i].extra||0)}
   function progress(){var d=dur(S.idx);return d?Math.min(1,S.el/d):1}
   function older(){return S.age==='older'}
   var STOPS=[[0,[38,182,96]],[.3,[38,182,96]],[.65,[240,180,30]],[1,[224,44,36]]];
@@ -318,7 +324,27 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
   function mkAct(key,mins){var q=PRE.filter(function(x){return x.key===key})[0];return {k:q.k,label:q.label,ing:q.ing,mins:mins,c:q.c,pol:'adult',adhoc:true}}
   function cleanAdhoc(){if(S.solo)return;for(var i=R.length-1;i>=0;i--)if(R[i].adhoc)R.splice(i,1)}
   function leaveSolo(){if(S.solo&&S.saved){R.splice.apply(R,[0,R.length].concat(S.saved))}S.saved=null;S.solo=false}
-  function reset(){cleanAdhoc();S.idx=0;S.el=S.solo?0:dur(0)*.2;S.phase='active';S.running=true;S.peek=false;S.chimed=false;S.armed=false;stopSound()}
+  function reset(){cleanAdhoc();R.forEach(function(r){r.extra=0});S.resume=null;S.idx=0;S.el=S.solo?0:dur(0)*.2;S.phase='active';S.running=true;S.peek=false;S.chimed=false;S.armed=false;stopSound()}
+  var STORE='kidsclock-web-setup';
+  function save(){
+    if(S.solo)return;
+    try{localStorage.setItem(STORE,JSON.stringify({age:S.age,tl:S.tl,sound:S.sound,warn:S.warn,
+      acts:R.filter(function(r){return !r.adhoc&&!r.final}).map(function(r){return {k:r.k,mins:r.mins,pol:r.pol}})}))}catch(e){}
+  }
+  (function load(){
+    try{
+      var d=JSON.parse(localStorage.getItem(STORE)||'null');if(!d)return;
+      if(d.age==='young'||d.age==='older')S.age=d.age;
+      if(['screen','ring','off'].indexOf(d.tl)>=0)S.tl=d.tl;
+      if(['chime','repeat','off'].indexOf(d.sound)>=0)S.sound=d.sound;
+      if(typeof d.warn==='boolean')S.warn=d.warn;
+      (d.acts||[]).forEach(function(a){
+        var r=R.filter(function(x){return x.k===a.k&&!x.final})[0];if(!r)return;
+        if(a.mins>=1&&a.mins<=30)r.mins=a.mins;
+        if(POL[a.pol])r.pol=a.pol;
+      });
+    }catch(e){}
+  })();
   reset();
 
   /* ---------- setup screen ---------- */
@@ -352,27 +378,27 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
   $('slist').addEventListener('click',function(e){
     var b=e.target.closest('[data-a]');if(!b)return;
     var i=+b.dataset.i,a=b.dataset.a;
-    if(a==='min'){R[i].mins=Math.min(30,Math.max(1,R[i].mins+ +b.dataset.d));renderSetup()}
+    if(a==='min'){R[i].mins=Math.min(30,Math.max(1,R[i].mins+ +b.dataset.d));save();renderSetup()}
     else if(a==='photo'){pickI=i;$('fPhoto').click()}
     else if(a==='clip'){pickI=i;$('fClip').click()}
     else if(a==='rm'){R[i].photo=null;R[i].clip=null;renderSetup()}
   });
   $('slist').addEventListener('change',function(e){
-    if(e.target.dataset.a==='pol'){R[+e.target.dataset.i].pol=e.target.value}
+    if(e.target.dataset.a==='pol'){R[+e.target.dataset.i].pol=e.target.value;save()}
   });
   $('fPhoto').onchange=function(e){var f=e.target.files[0];if(!f)return;R[pickI].photo=URL.createObjectURL(f);R[pickI].photoSample=false;e.target.value='';renderSetup()};
   $('fClip').onchange=function(e){var f=e.target.files[0];if(!f)return;R[pickI].clip=URL.createObjectURL(f);e.target.value='';renderSetup()};
-  $('ageYoung').onclick=function(){S.age='young';renderSetup()};
-  $('ageOlder').onclick=function(){S.age='older';renderSetup()};
-  $('tlMode').onchange=function(e){S.tl=e.target.value};
-  $('sndMode').onchange=function(e){S.sound=e.target.value};
-  $('sndWarn').onchange=function(e){S.warn=e.target.checked};
+  $('ageYoung').onclick=function(){S.age='young';save();renderSetup()};
+  $('ageOlder').onclick=function(){S.age='older';save();renderSetup()};
+  $('tlMode').onchange=function(e){S.tl=e.target.value;save()};
+  $('sndMode').onchange=function(e){S.sound=e.target.value;save()};
+  $('sndWarn').onchange=function(e){S.warn=e.target.checked;save()};
   $('sndTry').onclick=function(){ensureAudio();tone('warn');setTimeout(function(){tone('end')},1200)};
   $('btnStart').onclick=function(){reset();S.setup=false;ensureAudio();show()};
 
   function show(){
     $('setup').hidden=!S.setup;$('run').hidden=S.setup;
-    if(S.setup){stopSound();leaveSolo();cleanAdhoc();renderSetup()}else{closeSheet();closeZoom(true);render()}
+    if(S.setup){stopSound();leaveSolo();cleanAdhoc();S.resume=null;renderSetup()}else{closeSheet();closeZoom(true);render()}
   }
 
   /* ---------- sound ---------- */
@@ -404,11 +430,23 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
 
   /* ---------- run screen ---------- */
   var run=$('run'),core=$('core'),time=$('time'),next=$('next');
+  /* what comes next: the paused activity while a quick timer runs, otherwise the next in the routine */
+  function nextAct(){return S.resume?R[S.resume.idx]:R[S.idx+1]}
+  function resumeInterrupted(){
+    var r=S.resume;if(!r)return;
+    closeZoom(true);stopSound();
+    R.splice(S.idx,1); /* drop the finished quick timer */
+    S.idx=r.idx;S.el=r.el;S.resume=null;S.phase='active';S.peek=false;S.armed=false;S.running=true;
+    S.chimed=progress()>=.85; /* the nearly-done note already played */
+    render();
+  }
   function canChildStart(){
+    if(S.resume)return false;
     var n=R[S.idx+1];if(!n||S.phase!=='transition')return false;
     return n.pol==='tap'||(n.pol==='unlock'&&S.armed);
   }
   function advance(){
+    if(S.resume){resumeInterrupted();return}
     if(S.idx>=R.length-1)return;
     closeZoom(true);
     stopSound();
@@ -418,8 +456,9 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
   }
   function render(){
     if(S.setup)return;
-    var a=R[S.idx],n=R[S.idx+1],p=progress(),ol=older();
+    var a=R[S.idx],n=nextAct(),p=progress(),ol=older();
     run.style.setProperty('--c',a.c);
+    run.classList.toggle('fade',!!(a.final&&a.fade));
     var hasPhoto=ol&&a.photo&&!a.final,hasClip=ol&&a.clip&&!a.final;
     core.innerHTML=hasPhoto?('<img alt="" src="'+a.photo+'">'+(hasClip?'<span class="badge"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="'+a.c+'"/></svg></span>':'')):svg(a.k,'ic');
     core.setAttribute('aria-label',hasPhoto?'Look closer at '+a.label:a.label);
@@ -440,12 +479,15 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
     next.classList.toggle('go',go);
     next.classList.toggle('tappable',canChildStart());
     var h='';
-    if(go)h=canChildStart()?'All done! Tap what comes next.':'All done! Your grown-up will help.';
+    if(go)h=S.resume?'All done! Back to '+n.label.toLowerCase()+' in a moment.':(canChildStart()?'All done! Tap what comes next.':'All done! Your grown-up will help.');
     $('hint').textContent=h;
-    $('gate').classList.toggle('needed',go&&!canChildStart());
+    $('gate').classList.toggle('needed',go&&!canChildStart()&&!S.resume);
 
-    $('strip').innerHTML=ol?R.map(function(r,i){
-      return '<span class="pip'+(i===S.idx?' now':'')+(i<S.idx?' done':'')+'" style="--pc:'+r.c+'">'+svg(r.k).replace('<svg','<svg style="--c:'+r.c+'"')+'</span>';
+    var nowI=S.idx;
+    if(S.resume)nowI=S.resume.idx;else while(nowI>0&&R[nowI].adhoc)nowI--;
+    $('strip').innerHTML=(ol&&!S.solo)?R.map(function(r,i){
+      if(r.adhoc)return '';
+      return '<span class="pip'+(i===nowI?' now':'')+(i<nowI?' done':'')+'" style="--pc:'+r.c+'">'+svg(r.k).replace('<svg','<svg style="--c:'+r.c+'"')+'</span>';
     }).join(''):'';
 
     // sheet
@@ -455,15 +497,16 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
     $('bPause').textContent=S.running?'Pause':'Resume';
     $('bPeek').hidden=ol||!n||S.phase==='transition';
     $('bPeek').textContent=S.peek?"Hide what's next":"Show what's next";
-    var needArm=n&&n.pol==='unlock'&&S.phase==='transition';
+    var needArm=n&&n.pol==='unlock'&&S.phase==='transition'&&!S.resume;
     $('bArm').hidden=!needArm;
     $('bArm').textContent=S.armed?'Child can start next':'Let child start next';
     $('bSkip').disabled=!n;
-    $('bSkip').textContent=n?(n.final&&n.k==='done'?'Finish':'Start '+n.label.toLowerCase()):'Last activity';
+    $('bSkip').textContent=n?(S.resume?'Back to '+n.label.toLowerCase()+' now':(n.final&&n.k==='done'?'Finish':'Start '+n.label.toLowerCase())):'Last activity';
     $('quick').hidden=!!a.final;
+    $('qelse').hidden=!!a.adhoc; /* no nested interruptions */
   }
   function updateSay(){
-    var a=R[S.idx],n=R[S.idx+1],p=progress();
+    var a=R[S.idx],n=nextAct(),p=progress();
     var now=S.phase==='final'?(a.finalSay||'The day is done. Time for sleep.'):'We are '+a.ing+'.';
     var tail='';
     if(S.phase==='active'&&n)tail=' The big circle is getting smaller'+(S.tl!=='off'?' and the '+(S.tl==='screen'?'screen':'ring')+' is '+tlName(p)+'. When it is red, we are out of time.':'. When it is small, '+n.label.toLowerCase()+' comes next.');
@@ -475,10 +518,12 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
     $('left').textContent=a.final?'':(S.phase==='transition'?'Time is up':'About '+Math.ceil(rem/60)+' min left (grown-up only)');
   }
   setInterval(function(){
-    if(S.setup||!S.running||S.phase!=='active')return;
+    if(S.setup)return;
+    if(S.phase==='transition'&&S.resume&&performance.now()-S.transAt>=5000){resumeInterrupted();return}
+    if(!S.running||S.phase!=='active')return;
     S.el+=.1*S.speed;
     var p=progress();
-    if(p>=1){S.phase='transition';endSound();render();return}
+    if(p>=1){S.phase='transition';S.transAt=performance.now();endSound();render();return}
     if(p>=.85&&!S.chimed){S.chimed=true;if(S.warn&&S.sound!=='off')tone('warn');render();return}
     time.style.setProperty('--s',.46+.54*(1-p));
     paint();updateSay();updateLeft();
@@ -560,29 +605,39 @@ select{border:1px solid var(--rule);background:var(--surface);border-radius:10px
     minSel.innerHTML=[5,10,15,20,30].map(function(m){return '<option value="'+m+'">'+m+' min</option>'}).join('');
   }
   fillQuick($('qAct'),$('qMin'));fillQuick($('qActS'),$('qMinS'));
-  function startExtra(mins,act){
-    var cur=R[S.idx];
-    var a=act||{k:cur.k,label:cur.label,ing:cur.ing,c:cur.c,photo:cur.photo,clip:cur.clip,pol:'adult',adhoc:true};
-    a.mins=mins;a.adhoc=true;
+  /* "something else now": pauses the current activity, which auto-resumes 5 s after the quick timer ends.
+     From the red screen there is nothing left to pause, so it just hands over as usual. */
+  function startElse(mins,act){
+    if(R[S.idx].adhoc)return;
+    var a=act;a.mins=mins;a.adhoc=true;
     closeZoom(true);stopSound();
+    S.resume=S.phase==='active'?{idx:S.idx,el:S.el}:null;
     R.splice(S.idx+1,0,a);
     S.idx++;S.el=0;S.phase='active';S.peek=false;S.chimed=false;S.armed=false;S.running=true;
     closeSheet();render();
   }
-  Array.prototype.forEach.call(document.querySelectorAll('.qmore'),function(b){b.onclick=function(){startExtra(+b.dataset.m)}});
-  $('qGo').onclick=function(){startExtra(+$('qMin').value,mkAct($('qAct').value,+$('qMin').value))};
+  /* "more time": just extends this activity; works before it ends and from the red screen */
+  function moreTime(mins){
+    var cur=R[S.idx];if(cur.final)return;
+    cur.extra=(cur.extra||0)+mins*60;
+    if(S.phase==='transition'){S.phase='active';stopSound()}
+    S.chimed=progress()>=.85;
+    closeSheet();render();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.qmore'),function(b){b.onclick=function(){moreTime(+b.dataset.m)}});
+  $('qGo').onclick=function(){startElse(+$('qMin').value,mkAct($('qAct').value,+$('qMin').value))};
   $('qGoS').onclick=function(){
     leaveSolo();S.saved=R.slice();
     var a=mkAct($('qActS').value,+$('qMinS').value);
     var done={k:'done',label:'All done',ing:'all done',mins:0,c:'#3E9A62',pol:'tap',final:true,finalWord:'All done!',finalSay:'That is all for now. Well done!',finalAsk:'Ask: "What was the best bit?"'};
     R.splice(0,R.length,a,done);S.solo=true;
-    S.idx=0;S.el=0;S.phase='active';S.running=true;S.peek=false;S.chimed=false;S.armed=false;
+    S.resume=null;S.idx=0;S.el=0;S.phase='active';S.running=true;S.peek=false;S.chimed=false;S.armed=false;
     S.setup=false;ensureAudio();show();
   };
 
   /* ---------- demo helpers ---------- */
   $('dEnd').onclick=function(){if(S.setup||S.phase!=='active')return;S.el=Math.max(S.el,dur(S.idx)-5);render()};
-  $('dArm').onclick=function(){var n=R[S.idx+1];if(S.setup||!n||S.phase!=='transition'||n.pol!=='unlock')return;S.armed=true;render()};
+  $('dArm').onclick=function(){var n=R[S.idx+1];if(S.setup||S.resume||!n||S.phase!=='transition'||n.pol!=='unlock')return;S.armed=true;render()};
   $('speed').onchange=function(e){S.speed=+e.target.value};
 
   show();
