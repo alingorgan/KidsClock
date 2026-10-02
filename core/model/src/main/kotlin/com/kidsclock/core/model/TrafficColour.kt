@@ -31,17 +31,30 @@ fun trafficColour(progress: Double): Rgb {
     return with(TrafficColourStops) {
         when {
             p <= GREEN_UNTIL -> GREEN
-            p <= AMBER_AT -> blend(GREEN, AMBER, (p - GREEN_UNTIL) / (AMBER_AT - GREEN_UNTIL))
-            else -> blend(AMBER, RED, (p - AMBER_AT) / (1.0 - AMBER_AT))
+            p <= AMBER_AT -> mix(GREEN, AMBER, (p - GREEN_UNTIL) / (AMBER_AT - GREEN_UNTIL))
+            else -> mix(AMBER, RED, (p - AMBER_AT) / (1.0 - AMBER_AT))
         }
     }
 }
 
-private fun blend(
+/** SPEC §6 whole-screen mode: how far the gradient centre is mixed towards the traffic colour. */
+fun screenGradientCentreMix(progress: Double): Double = 0.34 + 0.24 * progress.coerceIn(0.0, 1.0)
+
+/** SPEC §6 whole-screen mode: how far the gradient edge is mixed towards the traffic colour (stronger than the centre). */
+fun screenGradientEdgeMix(progress: Double): Double = 0.56 + 0.38 * progress.coerceIn(0.0, 1.0)
+
+/** SPEC §6 whole-screen mode: the progress bubble becomes neutral translucent white at this alpha. */
+const val PROGRESS_BUBBLE_NEUTRAL_ALPHA = 0.42
+
+/** Linear-blends two colours; `fraction` is clamped to 0..1. */
+fun mix(
     from: Rgb,
     to: Rgb,
-    t: Double,
-): Rgb = Rgb(lerp(from.r, to.r, t), lerp(from.g, to.g, t), lerp(from.b, to.b, t))
+    fraction: Double,
+): Rgb {
+    val t = fraction.coerceIn(0.0, 1.0)
+    return Rgb(lerp(from.r, to.r, t), lerp(from.g, to.g, t), lerp(from.b, to.b, t))
+}
 
 private fun lerp(
     a: Int,

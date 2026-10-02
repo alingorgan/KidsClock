@@ -1,5 +1,7 @@
 package com.kidsclock.core.designsystem
 
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -37,5 +39,18 @@ class KcScreenSnapshotTest {
             }
         }
         compose.onRoot().captureRoboImage("src/test/snapshots/KcScreen_dark.png")
+    }
+
+    @Test
+    fun gradientBackground() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) {
+                KcScreen(
+                    testTag = "screen",
+                    background = Brush.radialGradient(listOf(Color(0xFF3E9A62), Color(0xFFE02C24))),
+                ) { KcText(text = "Stage", testTag = "label") }
+            }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/KcScreen_gradientBackground.png")
     }
 }
