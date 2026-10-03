@@ -6,8 +6,8 @@ Platform-neutral. Values marked **(tunable)** are starting points to test with c
 A phone the child carries shows the **current activity** as one large picture, **how much of it is left** as a shrinking circle plus a full-screen colour, and **what comes next** as a small dimmed picture. The caregiver sets up activities and durations, and controls handovers. The child never needs to read time or numbers.
 
 ## 2. Modes
-1. **Setup** (caregiver): child's age, activities, durations, photo/clip per activity, handover policy per activity, progress colour, end sound.
-2. **Run** (child-facing): the display described below. Caregiver controls are behind a hidden gesture.
+1. **Routines** (caregiver, the first screen): a list of saved routines and "+ New routine" (always offered). Tapping a routine opens a read-only **preview** (activities, minutes, who starts each, last screen, sound) with Start, Edit, Duplicate and Back. **Edit** changes the name, the activities (add up to 8, remove, move, name, pictogram, colour, minutes 1-60, "We are ..." phrase, start policy), the last screen ("All done!" or "Sleep time") and the sound; Save is refused with a reason until the routine has a name, at least one activity and a name on every activity. Delete asks twice. Age and progress colour are app-wide, shown on this screen. (Decisions 33-36; photos/clips per activity come later.)
+2. **Run** (child-facing): the display described below. Caregiver controls are behind a hidden gesture. "Back to routines" in the sheet leaves the run.
 
 ## 3. Age setting
 | Setting | Circle shows | "Next" | Day strip |
@@ -29,7 +29,7 @@ Photos/clips stay stored but unused for "Under 3".
 ## 5. Activity phases
 - `active`: timer running (or paused by the caregiver).
 - `transition`: time is up. Progress bubble fully shrunk, screen red, chime plays. Waiting for the handover to the next activity.
-- `final`: the last item. No timer, no progress bubble. Shows its own word and prompt (e.g. "Goodnight", or "All done!"). No chime. "Sleep time" fades slowly to dark, starting immediately when it appears over 5 seconds (decision 23).
+- `final`: the last item. No timer, no progress bubble. Shows its own word and prompt (e.g. "Goodnight", or "All done!"). No chime. "All done!" shows confetti that pours for 5 s (once when it appears, none under reduced motion, decorative only). "Sleep time" fades slowly to dark, starting immediately when it appears over 5 seconds (decision 23).
 
 Progress = elapsed ÷ duration, from 0 to 1. Reaching 1 enters `transition`.
 
@@ -87,8 +87,10 @@ For moments with no routine or a change of plan (e.g. the playground).
 - Caregiver sets a photo and a clip per activity in setup (camera or gallery). Ideas to support: the child's own toothbrush, the place where it happens (the sink), or a recording of the child doing it.
 - Media is local only. See privacy rule in `CLAUDE.md`.
 
-## 12. Default routine (example content for first-run)
-Evening: Playtime 8 min, Tidy up 3, Bath time 10, Brush teeth 3, Story time 8, Sleep time (final, "Goodnight"). Activity colours: amber `#D98214`, green `#3E9A62`, blue `#2F86CC`, teal `#1E9C96`, purple `#8462C2`, indigo `#33448A`. Pictograms are simple white shapes on the coloured bubble (blocks, box, tub, toothbrush, book, moon); presets add swing, apple, sun and check mark.
+## 12. Example routines (first-run content)
+**Evening**: Playtime 8 min, Tidy up 3, Bath time 10, Brush teeth 3, Story time 8, Sleep time (final, "Goodnight"). Activity colours: amber `#D98214`, green `#3E9A62`, blue `#2F86CC`, teal `#1E9C96`, purple `#8462C2`, indigo `#33448A`. Pictograms are simple white shapes on the coloured bubble (blocks, box, tub, toothbrush, book, moon); presets add swing, apple, sun and check mark; routines add heart (cuddle), toilet, T-shirt (get dressed), hairbrush, door with arrow (leave the house) and a star for anything else.
+
+**Morning**: Cuddle in bed 5, Go to the toilet 3, Brush teeth 3, Get dressed 8, Brush hair 3, Get ready to leave 8 (grown-up starts it); last screen "All done!".
 
 ## 13. Not in scope yet
 Clock face or numbers for the child, ages above about 4½, custom activity names/photos in a quick timer, multi-day scheduling, cloud sync/accounts, iOS.

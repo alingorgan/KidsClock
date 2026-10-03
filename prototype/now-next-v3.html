@@ -1,0 +1,793 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Now and Next · routines</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#e4e9ee; --surface:#ffffff; --ink:#18222c; --ink2:#55636f; --rule:#d6dde4;
+  --stage:#f6f8fa; --bezel:#1a232b; --accent:#1f6f8b; --accent-ink:#ffffff; --focus:#d9591f; --danger:#b3261e;
+  --f-kid:'Fredoka','Nunito','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'DM Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1116; --surface:#17212a; --ink:#e8eef2; --ink2:#a0afba; --rule:#2a3a46;
+  --stage:#141c23; --bezel:#05080b; --accent:#6cc0dc; --accent-ink:#0e151b; --focus:#f08653; --danger:#f2988f;}}
+:root[data-theme="dark"]{
+  --bg:#0b1116; --surface:#17212a; --ink:#e8eef2; --ink2:#a0afba; --rule:#2a3a46;
+  --stage:#141c23; --bezel:#05080b; --accent:#6cc0dc; --accent-ink:#0e151b; --focus:#f08653; --danger:#f2988f;}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:20px 40px}
+button,select,input{font:inherit;color:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.page{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:28px;justify-content:center;align-items:flex-start}
+[hidden]{display:none!important}
+
+/* ---------- device ---------- */
+.phone{position:relative;width:100%;max-width:392px;height:min(780px,calc(100vh - 40px));min-height:600px;flex:none;
+  border:9px solid var(--bezel);border-radius:44px;overflow:hidden;background:var(--surface);isolation:isolate}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.gu{background:var(--surface);overflow-y:auto}
+
+/* ---------- grown-up screens (library, preview, editor) ---------- */
+.shead{padding:26px 20px 12px;display:flex;flex-direction:column;gap:10px}
+.shead h1{font-family:var(--f-kid);font-weight:600;font-size:1.6rem;margin:0;line-height:1.1}
+.shead p{margin:0;color:var(--ink2);font-size:.88rem}
+.pad{padding:0 20px}
+.sfoot{position:sticky;bottom:0;margin-top:auto;padding:12px 20px 20px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--rule);background:var(--surface)}
+.btn{border:1px solid var(--rule);background:var(--surface);border-radius:12px;padding:11px 14px;cursor:pointer;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:1.02rem}
+.btn.danger{color:var(--danger);border-color:var(--danger)}
+.btn:hover{border-color:var(--ink2)}
+.btn[disabled]{opacity:.4;cursor:default}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.note{font-size:.76rem;color:var(--ink2);margin:0}
+.seg{display:flex;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:transparent;padding:8px 10px;cursor:pointer;font-weight:500;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+select,.inp{border:1px solid var(--rule);background:var(--surface);border-radius:10px;padding:7px 10px;font-size:.88rem;min-width:0}
+.inp{width:100%;box-sizing:border-box}
+.inp.bad{border-color:var(--danger)}
+label.fld{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--ink2)}
+label.chk{flex-direction:row;align-items:center;gap:8px}
+.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none}
+.dot svg{width:18px;height:18px}
+.step{display:flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:.8rem}
+.step button{width:30px;height:30px;border-radius:8px;border:1px solid var(--rule);background:var(--surface);cursor:pointer;line-height:1}
+.step button[disabled]{opacity:.35;cursor:default}
+.step span{min-width:48px;text-align:center}
+h2.cap{margin:18px 0 6px;font-family:var(--f-mono);font-weight:500;font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2)}
+
+/* library */
+.rrow{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;border:1px solid var(--rule);background:var(--surface);border-radius:16px;padding:12px 14px;cursor:pointer;margin-bottom:10px}
+.rrow:hover{border-color:var(--ink2)}
+.rrow b{font-family:var(--f-kid);font-weight:600;font-size:1.15rem}
+.rrow small{color:var(--ink2)}
+.pips{display:flex;gap:5px;flex-wrap:wrap}
+.pips .dot{width:24px;height:24px}.pips .dot svg{width:14px;height:14px}
+.empty{border:1px dashed var(--ink2);border-radius:16px;padding:18px;color:var(--ink2);text-align:center;margin-bottom:10px}
+
+/* preview */
+.prow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--rule)}
+.prow:first-child{border-top:0}
+.prow .t{flex:1;display:flex;flex-direction:column}
+.prow .t b{font-weight:600}.prow .t small{color:var(--ink2)}
+.prow .m{font-family:var(--f-mono);font-size:.8rem;color:var(--ink2)}
+.prow .dot{width:38px;height:38px}.prow .dot svg{width:23px;height:23px}
+
+/* editor */
+.arow{display:flex;flex-direction:column;gap:10px;padding-block:14px;border-top:1px solid var(--rule)}
+.ahead{display:flex;align-items:center;gap:8px}
+.ahead .inp{flex:1}
+.ibtn{width:32px;height:32px;border-radius:8px;border:1px solid var(--rule);background:var(--surface);cursor:pointer;line-height:1;flex:none}
+.ibtn[disabled]{opacity:.3;cursor:default}
+.swatches,.picgrid{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:30px;height:30px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--rule);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.pg{width:40px;height:40px;border-radius:12px;border:1px solid var(--rule);background:var(--surface);cursor:pointer;display:grid;place-items:center;padding:0}
+.pg svg{width:26px;height:26px}
+.pg[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.err{margin:8px 0 0;padding:8px 12px;border-radius:10px;border:1px solid var(--danger);color:var(--danger);font-size:.84rem}
+.err ul{margin:0;padding-left:18px}
+
+/* ---------- run ---------- */
+#run{isolation:isolate;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;--c:#D98214;background:color-mix(in srgb,var(--c) 11%,var(--stage));align-items:center;justify-content:center;gap:20px;padding:56px 16px 110px;transition:background 1.4s}
+.fadeout{position:absolute;inset:0;z-index:-1;background:#05080b;opacity:0;pointer-events:none;transition:opacity 0s}
+#run.fade .fadeout{opacity:1;transition:opacity 5s linear}
+#run.fade .word{color:#e8eef2;transition:color 5s linear}
+.strip{position:absolute;top:18px;left:56px;right:16px;display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.pip{width:22px;height:22px;border-radius:50%;background:var(--pc);opacity:.28;display:grid;place-items:center;transition:opacity .6s,transform .6s}
+.pip svg{width:13px;height:13px}
+.pip.now{opacity:1;transform:scale(1.2);box-shadow:0 0 0 2px var(--stage),0 0 0 4px var(--pc)}
+.pip.done{opacity:.12}
+.gate{position:absolute;top:8px;left:8px;width:44px;height:44px;border:0;background:transparent;border-radius:50%;cursor:pointer;display:grid;place-items:center;padding:0;-webkit-user-select:none;user-select:none;touch-action:none}
+.gate i{width:16px;height:16px;border-radius:50%;background:#5B5BF0;border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+.gate svg{position:absolute;inset:4px;width:36px;height:36px;transform:rotate(-90deg)}
+.gate circle{fill:none;stroke:var(--ink);stroke-width:3;stroke-dasharray:88;stroke-dashoffset:88;opacity:0}
+.gate.needed i{animation:nudge 1.6s ease-in-out infinite;background:#F0782B}
+@keyframes nudge{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+.gate.hold circle{opacity:.8;animation:fillring 1.2s linear forwards}
+@keyframes fillring{to{stroke-dashoffset:0}}
+
+.orb{position:relative;width:min(72vw,300px);aspect-ratio:1;display:grid;place-items:center;flex:none}
+.time{position:absolute;inset:0;border-radius:50%;background:color-mix(in srgb,var(--c) 24%,transparent);transform:scale(var(--s,1));transition:transform .25s linear,background 1.4s}
+.core{position:relative;width:46%;aspect-ratio:1;border-radius:50%;background:var(--c);display:grid;place-items:center;border:0;padding:0;transition:background 1.4s,box-shadow .25s linear;box-shadow:0 0 0 4px var(--c);cursor:default}
+.core svg.ic{width:62%;height:62%}
+#run.winding .core{animation:breathe 3.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.bgmode .word,.bgmode .next .cap small,.bgmode .hint{color:var(--ink)}
+.word{font-family:var(--f-kid);font-weight:600;font-size:2.3rem;color:color-mix(in srgb,var(--c) 70%,var(--ink));line-height:1.1;text-align:center;margin:0}
+
+.next{position:absolute;right:14px;bottom:14px;display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:6px;border-radius:99px;opacity:.5;transition:opacity .8s,transform .8s;transform-origin:right bottom;--n:#3E9A62}
+.next .bub{width:56px;height:56px;border-radius:50%;background:var(--n);display:grid;place-items:center;flex:none}
+.next .bub svg{width:60%;height:60%}
+.next .cap{display:flex;flex-direction:column;text-align:right;font-family:var(--f-kid);line-height:1.15}
+.next .cap small{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.next .cap b{font-weight:500;font-size:1.05rem}
+.next.go{opacity:1;transform:scale(1.25)}
+.next.go.tappable{cursor:pointer}
+.next.go.tappable .bub{animation:ring 2.4s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--n) 55%,transparent)}100%{box-shadow:0 0 0 20px transparent}}
+.hint{pointer-events:none;text-align:center;max-width:260px;min-height:2.5em;font-family:var(--f-kid);color:var(--ink2);font-size:.98rem;line-height:1.25}
+
+/* confetti on the "All done!" screen (decorative; skipped under reduced motion) */
+.confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:4}
+.confetti i{position:absolute;top:-4%;left:var(--x);width:var(--w);height:var(--h);background:var(--k);border-radius:2px;animation:confetti-fall var(--d) var(--dl) cubic-bezier(.3,.5,.6,1) forwards}
+@keyframes confetti-fall{to{transform:translate(var(--dx),900px) rotate(var(--r))}}
+
+/* sheet */
+.scrim{position:absolute;inset:0;z-index:8;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:9;background:var(--surface);border-radius:22px 22px 0 0;padding:18px 18px 22px;display:flex;flex-direction:column;gap:14px;transform:translateY(105%);transition:transform .3s ease;max-height:86%;overflow-y:auto}
+.sheet.on{transform:none}
+.sheet h2{margin:0;font-family:var(--f-mono);font-weight:500;font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2)}
+.say{display:flex;flex-direction:column;gap:4px}
+.say p{margin:0;font-size:1rem}
+.say .ask{color:var(--ink2);font-size:.88rem}
+.say .left{font-family:var(--f-mono);font-size:.75rem;color:var(--ink2)}
+.srow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.srow .btn{padding:10px 8px;font-size:.9rem}
+.quick{display:flex;flex-direction:column;gap:8px}
+.quick .r3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.qnew,.qs{display:flex;gap:8px}
+.qnew select,.qs select{flex:1;min-width:0}
+.quick .sub{margin:0;font-size:.8rem;color:var(--ink2)}
+
+/* side notes */
+.side{flex:1;min-width:250px;max-width:400px;display:flex;flex-direction:column;gap:18px;padding-top:6px}
+.side h2{margin:0;font-family:var(--f-mono);font-weight:500;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2)}
+.side p,.side li{color:var(--ink2);font-size:.9rem;margin:0}
+.side ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.side label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--ink2)}
+.side .row{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:440px){.phone{border-width:0;border-radius:0;height:calc(100vh - 20px)}}
+@media (prefers-reduced-motion:reduce){#run.winding .core,.next.go.tappable .bub{animation:none}.time,#run,.core,.sheet,#run.fade .fadeout,#run.fade .word{transition:none}}
+</style>
+
+<div class="page">
+
+<div class="phone" id="phone">
+
+  <!-- LIBRARY: first screen -->
+  <section class="screen gu" id="library" aria-label="Routines">
+    <div class="shead">
+      <h1>Routines</h1>
+      <p>Pick a routine to look it over and start it. Everything stays on this device.</p>
+    </div>
+    <div class="pad" id="rlist"></div>
+    <div class="pad">
+      <button class="btn primary" id="btnNew" type="button" style="width:100%">+ New routine</button>
+      <h2 class="cap">Display (every routine)</h2>
+      <div class="seg" role="group" aria-label="Child's age">
+        <button type="button" id="ageYoung" aria-pressed="false">Under 3</button>
+        <button type="button" id="ageOlder" aria-pressed="true">3 and over</button>
+      </div>
+      <p class="note" id="ageNote" style="margin-top:6px"></p>
+      <label class="fld" style="margin-top:10px">Progress colour
+        <select id="tlMode"><option value="screen">Whole screen</option><option value="ring">Ring around the picture</option><option value="off">Activity colour only</option></select></label>
+    </div>
+    <div class="sfoot">
+      <div class="qs"><select id="qActS" aria-label="Quick timer activity"></select><select id="qMinS" aria-label="Quick timer minutes"></select><button class="btn" id="qGoS" type="button">Quick timer</button></div>
+      <p class="note">No routine needed, for example at the playground.</p>
+    </div>
+  </section>
+
+  <!-- PREVIEW: look over one routine, then start -->
+  <section class="screen gu" id="detail" aria-label="Routine preview" hidden>
+    <div class="shead">
+      <h1 id="dName"></h1>
+      <p id="dMeta"></p>
+    </div>
+    <div class="pad" id="dList"></div>
+    <div class="pad" id="dSound"></div>
+    <div class="sfoot">
+      <button class="btn primary" id="dStart" type="button">Start routine</button>
+      <div class="row2"><button class="btn" id="dEdit" type="button">Edit</button><button class="btn" id="dDup" type="button">Duplicate</button></div>
+      <button class="btn" id="dBack" type="button">Back to routines</button>
+    </div>
+  </section>
+
+  <!-- EDITOR -->
+  <section class="screen gu" id="editor" aria-label="Edit routine" hidden>
+    <div class="shead"><h1 id="eTitle">Edit routine</h1></div>
+    <div class="pad">
+      <label class="fld">Routine name<input class="inp" id="eName" type="text" maxlength="30" placeholder="e.g. Morning"></label>
+      <h2 class="cap">Activities</h2>
+      <div id="eList"></div>
+      <button class="btn" id="eAdd" type="button" style="width:100%;margin-top:6px">+ Add activity</button>
+      <p class="note" id="eAddNote" style="margin-top:6px"></p>
+      <h2 class="cap">Last screen</h2>
+      <label class="fld">When the routine is finished
+        <select id="eFinal"><option value="done">All done! (check mark)</option><option value="sleep">Sleep time (fades to dark)</option></select></label>
+      <h2 class="cap">Sound</h2>
+      <div class="row2">
+        <label class="fld">When time is up
+          <select id="eSound"><option value="chime">Gentle chime</option><option value="repeat">Repeats every 20 s</option><option value="off">No sound</option></select></label>
+        <label class="fld chk" style="align-self:end;padding-bottom:8px"><input type="checkbox" id="eWarn"> Soft note when nearly done</label>
+      </div>
+      <button class="btn" id="eTry" type="button" style="margin-top:8px">Play the sounds</button>
+      <div class="err" id="eErr" role="alert" hidden></div>
+    </div>
+    <div class="sfoot">
+      <div class="row2"><button class="btn" id="eCancel" type="button">Cancel</button><button class="btn primary" id="eSave" type="button">Save</button></div>
+      <button class="btn danger" id="eDel" type="button">Delete routine</button>
+    </div>
+  </section>
+
+  <!-- RUN -->
+  <section class="screen" id="run" aria-label="Child display" hidden>
+    <button class="gate" id="gate" type="button" aria-label="Grown-up controls: press and hold"><i></i>
+      <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14"/></svg></button>
+    <div class="fadeout" id="fadeout"></div>
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+    <div class="strip" id="strip"></div>
+    <div class="orb"><div class="time" id="time"></div><div class="core" id="core"></div></div>
+    <p class="word" id="word" aria-live="polite"></p>
+    <button class="next" id="next" type="button" hidden>
+      <span class="cap"><small>Next</small><b id="nextWord"></b></span>
+      <span class="bub" id="nextBub"></span>
+    </button>
+    <div class="hint" id="hint"></div>
+
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet" id="sheet" role="dialog" aria-label="Grown-up controls">
+      <div class="say"><h2>Say together</h2><p id="sayNow"></p><p class="ask" id="sayAsk"></p><span class="left" id="left"></span></div>
+      <div class="srow">
+        <button class="btn" id="bPause" type="button">Pause</button>
+        <button class="btn" id="bPeek" type="button">Show what's next</button>
+        <button class="btn" id="bArm" type="button">Let child start next</button>
+        <button class="btn primary" id="bSkip" type="button">Start next</button>
+        <button class="btn" id="bRestart" type="button">Restart</button>
+        <button class="btn" id="bSetup" type="button">Back to routines</button>
+      </div>
+      <div class="quick" id="quick">
+        <h2>Quick timer</h2>
+        <p class="sub">More time on this activity (from before it ends, or once it is red). Then the routine carries on.</p>
+        <div class="r3"><button class="btn qmore" type="button" data-m="5">5 more min</button><button class="btn qmore" type="button" data-m="10">10 more min</button><button class="btn qmore" type="button" data-m="15">15 more min</button></div>
+        <div id="qelse"><p class="sub">Or start something else now. This activity pauses and picks up again afterwards.</p>
+        <div class="qnew"><select id="qAct" aria-label="Activity"></select><select id="qMin" aria-label="Minutes"></select><button class="btn" id="qGo" type="button">Start</button></div></div>
+      </div>
+      <button class="btn" id="bClose" type="button">Close</button>
+    </div>
+  </section>
+</div>
+
+<aside class="side">
+  <div>
+    <h2>What to try</h2>
+    <ul>
+      <li>The app opens on the list of routines. Two examples are provided (Evening, Morning). Tap one to preview its activities, then Start.</li>
+      <li>Edit a routine: rename it, add, remove or move activities, change a picture, colour, minutes or who starts it. Save is blocked, with the reason shown, until the routine is valid.</li>
+      <li>"+ New routine" starts empty. Duplicate copies a routine so you can tweak it. Delete asks twice.</li>
+      <li>Reload the page: your routines are still there. A run in progress is not kept; it starts again from the beginning (decision 31).</li>
+      <li>Sound is set per routine. Age and progress colour apply to every routine.</li>
+      <li>On the child screen, press and hold the small dot top-left for about a second to open the grown-up sheet. "Back to routines" leaves the run.</li>
+      <li>Quick timer: "5 more min" extends this activity; "Something else now" pauses it and it resumes 5 s after the quick timer ends. From the list, "Quick timer" runs one with no routine.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>Demo helpers</h2>
+    <div class="row">
+      <button class="btn" id="dEnd" type="button">Jump near the end</button>
+      <button class="btn" id="dArm" type="button">Grown-up: unlock next</button>
+      <button class="btn" id="dReset" type="button">Reset routines to examples</button>
+    </div>
+    <label style="margin-top:10px">Speed
+      <select id="speed"><option value="1">Real time</option><option value="20" selected>Demo · 20× faster</option><option value="60">Demo · 60× faster</option></select>
+    </label>
+  </div>
+  <p>Web stand-in for the native app. Photos and clips are not part of this version. The native app would store routines in app-private storage, run full screen and lock to the run view.</p>
+</aside>
+
+</div>
+
+<script>
+(function(){
+  var ICON={
+    play:'<rect x="14" y="58" width="32" height="30" rx="5" fill="#fff"/><rect x="54" y="58" width="32" height="30" rx="5" fill="#fff"/><rect x="34" y="24" width="32" height="30" rx="5" fill="#fff" transform="rotate(-8 50 39)"/>',
+    tidy:'<path d="M14 50h72l-7 38H21z" fill="#fff"/><rect x="38" y="16" width="24" height="24" rx="5" fill="#fff"/><path d="M14 50h72" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/>',
+    bath:'<path d="M10 52h80v8a24 24 0 0 1-24 24H34A24 24 0 0 1 10 60z" fill="#fff"/><circle cx="32" cy="34" r="9" fill="none" stroke="#fff" stroke-width="6"/><circle cx="56" cy="24" r="6" fill="none" stroke="#fff" stroke-width="5"/><circle cx="72" cy="38" r="5" fill="none" stroke="#fff" stroke-width="5"/>',
+    teeth:'<g transform="rotate(-38 50 50)"><rect x="8" y="42" width="56" height="16" rx="8" fill="#fff"/><rect x="58" y="30" width="34" height="40" rx="7" fill="#fff"/><path d="M68 38v24M76 38v24M84 38v24" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/></g>',
+    story:'<path d="M50 30C38 21 22 21 10 26v50c12-5 28-5 40 4 12-9 28-9 40-4V26c-12-5-28-5-40 4z" fill="#fff"/><path d="M50 30v50" stroke="var(--c)" stroke-width="4"/>',
+    swing:'<path d="M16 90L30 16h40l14 74" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M42 18v44M58 18v44" stroke="#fff" stroke-width="4"/><rect x="34" y="62" width="32" height="10" rx="5" fill="#fff"/>',
+    snack:'<path d="M50 32c-14-10-34-2-32 22 2 20 16 34 32 30 16 4 30-10 32-30 2-24-18-32-32-22z" fill="#fff"/><path d="M50 32c0-10 4-18 12-22" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/>',
+    sun:'<circle cx="50" cy="50" r="20" fill="#fff"/><g stroke="#fff" stroke-width="7" stroke-linecap="round"><path d="M50 10v10M50 80v10M10 50h10M80 50h10M22 22l7 7M71 71l7 7M78 22l-7 7M29 71l-7 7"/></g>',
+    done:'<path d="M22 54l20 20 38-44" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>',
+    sleep:'<path d="M60 12a38 38 0 1 0 28 62A32 32 0 0 1 60 12z" fill="#fff"/><circle cx="78" cy="30" r="5" fill="#fff"/><circle cx="90" cy="50" r="3.5" fill="#fff"/>',
+    /* new for routines */
+    cuddle:'<path d="M50 86C12 60 10 30 29 21c11-5 18 2 21 10 3-8 10-15 21-10 19 9 17 39-21 65z" fill="#fff"/>',
+    toilet:'<rect x="30" y="10" width="40" height="22" rx="5" fill="#fff"/><path d="M16 40h68c0 22-10 32-24 36v14H40V76C26 72 16 62 16 40z" fill="#fff"/><path d="M30 50h40" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/>',
+    dress:'<path d="M36 12L6 30l11 19 15-8v47h36V41l15 8 11-19-30-18c-3 9-25 9-28 0z" fill="#fff"/>',
+    hair:'<g transform="rotate(-38 50 50)"><rect x="6" y="43" width="46" height="14" rx="7" fill="#fff"/><rect x="48" y="24" width="44" height="52" rx="13" fill="#fff"/><path d="M60 34v32M70 34v32M80 34v32" stroke="var(--c)" stroke-width="4" stroke-linecap="round"/></g>',
+    leave:'<rect x="14" y="10" width="40" height="80" rx="4" fill="#fff"/><circle cx="44" cy="52" r="4" fill="var(--c)"/><path d="M62 52h26M78 40l12 12-12 12" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>',
+    star:'<path d="M50 8l12.5 27.5L92 39 70 59.5 76 90 50 74.5 24 90l6-30.5L8 39l29.5-3.5z" fill="#fff" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>'
+  };
+  var PICS=[['cuddle','Cuddle'],['toilet','Toilet'],['teeth','Teeth'],['dress','Get dressed'],['hair','Hair'],['leave','Leave the house'],['play','Play'],['tidy','Tidy up'],['bath','Bath'],['story','Story'],['snack','Snack'],['swing','Playground'],['sun','Outside'],['star','Other']];
+  var COLORS=[['Amber','#D98214'],['Green','#3E9A62'],['Blue','#2F86CC'],['Teal','#1E9C96'],['Purple','#8462C2'],['Indigo','#33448A']];
+  var POL={tap:'Child taps',unlock:'Grown-up unlocks, child taps',adult:'Grown-up only'};
+  var SND={chime:'Gentle chime',repeat:'Chime, repeats every 20 s',off:'No sound'};
+  var FIN={done:'All done! (check mark)',sleep:'Sleep time (fades to dark)'};
+  var MAXA=8,MINM=1,MAXM=60,MAXNAME=30;
+
+  var $=function(id){return document.getElementById(id)};
+  var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+  var svg=function(k,cls,col){return '<svg'+(cls?' class="'+cls+'"':'')+(col?' style="--c:'+col+'"':'')+' viewBox="0 0 100 100" aria-hidden="true">'+(ICON[k]||ICON.star)+'</svg>'};
+  var dotHtml=function(a){return '<span class="dot" style="background:'+a.c+'">'+svg(a.k,'',a.c)+'</span>'};
+  var uid=function(){return 'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)};
+  var clone=function(o){return JSON.parse(JSON.stringify(o))};
+
+  /* ---------- stored data (routines are persisted; a run is not) ---------- */
+  var STORE='kidsclock-web-v3',VERSION=1;
+  function act(k,label,ing,mins,c,pol){return {k:k,label:label,ing:ing,mins:mins,c:c,pol:pol}}
+  function defaults(){
+    return [
+      {id:uid(),name:'Evening',final:'sleep',sound:'chime',warn:true,acts:[
+        act('play','Playtime','playing',8,'#D98214','tap'),
+        act('tidy','Tidy up','tidying up',3,'#3E9A62','tap'),
+        act('bath','Bath time','having a bath',10,'#2F86CC','unlock'),
+        act('teeth','Brush teeth','brushing teeth',3,'#1E9C96','tap'),
+        act('story','Story time','reading a story',8,'#8462C2','adult')]},
+      {id:uid(),name:'Morning',final:'done',sound:'chime',warn:true,acts:[
+        act('cuddle','Cuddle in bed','having a cuddle',5,'#8462C2','tap'),
+        act('toilet','Go to the toilet','going to the toilet',3,'#2F86CC','tap'),
+        act('teeth','Brush teeth','brushing teeth',3,'#1E9C96','tap'),
+        act('dress','Get dressed','getting dressed',8,'#D98214','tap'),
+        act('hair','Brush hair','brushing hair',3,'#33448A','tap'),
+        act('leave','Get ready to leave','getting ready to leave the house',8,'#3E9A62','adult')]}
+    ];
+  }
+  var DB={v:VERSION,age:'older',tl:'screen',routines:[]};
+  function sane(r){
+    return r&&typeof r.id==='string'&&typeof r.name==='string'&&FIN[r.final]&&SND[r.sound]&&typeof r.warn==='boolean'&&Array.isArray(r.acts)&&
+      r.acts.length>=1&&r.acts.length<=MAXA&&r.acts.every(function(a){
+        return a&&typeof a.label==='string'&&a.label.trim()&&ICON[a.k]&&typeof a.ing==='string'&&/^#[0-9A-Fa-f]{6}$/.test(a.c)&&POL[a.pol]&&
+          a.mins>=MINM&&a.mins<=MAXM&&a.mins===Math.round(a.mins)});
+  }
+  function load(){
+    try{
+      var d=JSON.parse(localStorage.getItem(STORE)||'null');
+      if(d&&d.v===VERSION&&Array.isArray(d.routines)){
+        DB.age=d.age==='young'?'young':'older';
+        DB.tl=['screen','ring','off'].indexOf(d.tl)>=0?d.tl:'screen';
+        DB.routines=d.routines.filter(sane);
+        return;
+      }
+    }catch(e){}
+    DB.routines=defaults(); /* missing, corrupt or a different version: start from the examples */
+  }
+  function save(){try{localStorage.setItem(STORE,JSON.stringify(DB))}catch(e){}}
+  function byId(id){return DB.routines.filter(function(r){return r.id===id})[0]}
+  load();
+
+  /* ---------- views ---------- */
+  var VIEWS=['library','detail','editor','run'];
+  var S={view:'library',cur:null,draft:null,from:'library',delArmed:false,
+    idx:0,el:0,phase:'active',running:true,speed:20,peek:false,chimed:false,armed:false,solo:false,resume:null,transAt:0,sound:'chime',warn:true,sndTimer:null};
+  function go(v){
+    S.view=v;
+    VIEWS.forEach(function(n){$(n).hidden=n!==v});
+    if(v!=='run'){stopSound();closeSheet();S.celebrated=false;clearConfetti()}
+    if(v==='library')renderLibrary();
+    if(v==='detail')renderDetail();
+    if(v==='editor')renderEditor();
+    if(v==='run')render();
+  }
+  function total(r){return r.acts.reduce(function(s,a){return s+a.mins},0)}
+
+  /* ---------- library ---------- */
+  function renderLibrary(){
+    $('rlist').innerHTML=DB.routines.length?DB.routines.map(function(r){
+      return '<button type="button" class="rrow" data-id="'+r.id+'"><b>'+esc(r.name)+'</b>'+
+        '<span class="pips">'+r.acts.map(dotHtml).join('')+'</span>'+
+        '<small>'+r.acts.length+' activities · about '+total(r)+' min</small></button>';
+    }).join(''):'<div class="empty">No routines yet. Make your first one.</div>';
+    var ol=DB.age==='older';
+    $('ageYoung').setAttribute('aria-pressed',String(!ol));
+    $('ageOlder').setAttribute('aria-pressed',String(ol));
+    $('ageNote').textContent=ol?'The next activity is always shown, and the day strip shows where you are.':'Under 3: line pictures only, and "next" stays hidden until the grown-up shows it.';
+    $('tlMode').value=DB.tl;
+  }
+  $('rlist').addEventListener('click',function(e){var b=e.target.closest('[data-id]');if(!b)return;S.cur=b.dataset.id;go('detail')});
+  $('btnNew').onclick=function(){openEditor(null)};
+  $('ageYoung').onclick=function(){DB.age='young';save();renderLibrary()};
+  $('ageOlder').onclick=function(){DB.age='older';save();renderLibrary()};
+  $('tlMode').onchange=function(e){DB.tl=e.target.value;save()};
+
+  /* ---------- preview ---------- */
+  function renderDetail(){
+    var r=byId(S.cur);if(!r){go('library');return}
+    $('dName').textContent=r.name;
+    $('dMeta').textContent=r.acts.length+' activities · about '+total(r)+' min';
+    $('dList').innerHTML=r.acts.map(function(a,i){
+      return '<div class="prow">'+dotHtml(a)+'<span class="t"><b>'+esc(a.label)+'</b><small>'+(i===0?'Begins when you press Start':POL[a.pol])+'</small></span><span class="m">'+a.mins+' min</span></div>';
+    }).join('')+'<div class="prow">'+dotHtml({k:r.final==='sleep'?'sleep':'done',c:r.final==='sleep'?'#33448A':'#3E9A62'})+'<span class="t"><b>'+(r.final==='sleep'?'Sleep time':'All done!')+'</b><small>Last screen</small></span></div>';
+    $('dSound').innerHTML='<h2 class="cap">Sound</h2><p class="note" style="font-size:.88rem">'+SND[r.sound]+(r.sound!=='off'&&r.warn?', soft note when nearly done':'')+'</p>';
+  }
+  $('dBack').onclick=function(){go('library')};
+  $('dStart').onclick=function(){startRoutine(byId(S.cur))};
+  $('dEdit').onclick=function(){openEditor(S.cur)};
+  $('dDup').onclick=function(){
+    var r=byId(S.cur);if(!r)return;
+    var c=clone(r);c.id=uid();c.name=(r.name+' copy').slice(0,MAXNAME);
+    DB.routines.push(c);save();S.cur=c.id;renderDetail();
+  };
+
+  /* ---------- editor ---------- */
+  function openEditor(id){
+    S.from=id?'detail':'library';S.delArmed=false;
+    if(id)S.draft=clone(byId(id));
+    else S.draft={id:uid(),name:'',final:'done',sound:'chime',warn:true,acts:[],isNew:true};
+    go('editor');
+  }
+  function validate(d){
+    var e=[];
+    if(!d.name.trim())e.push('Give the routine a name.');
+    if(!d.acts.length)e.push('Add at least one activity.');
+    d.acts.forEach(function(a,i){if(!a.label.trim())e.push('Activity '+(i+1)+' needs a name.')});
+    return e;
+  }
+  function showErrors(){
+    var e=validate(S.draft);
+    $('eErr').hidden=!e.length;
+    $('eErr').innerHTML=e.length?'<ul>'+e.map(function(m){return '<li>'+esc(m)+'</li>'}).join('')+'</ul>':'';
+    $('eSave').disabled=!!e.length;
+    $('eName').classList.toggle('bad',!S.draft.name.trim());
+    Array.prototype.forEach.call($('eList').querySelectorAll('input[data-f="label"]'),function(inp){inp.classList.toggle('bad',!inp.value.trim())});
+  }
+  function renderEditor(){
+    var d=S.draft;
+    $('eTitle').textContent=d.isNew?'New routine':'Edit routine';
+    $('eName').value=d.name;$('eFinal').value=d.final;$('eSound').value=d.sound;$('eWarn').checked=d.warn;
+    $('eDel').hidden=!!d.isNew;
+    $('eDel').textContent=S.delArmed?'Tap again to delete for good':'Delete routine';
+    $('eList').innerHTML=d.acts.length?d.acts.map(function(a,i){
+      var last=d.acts.length-1;
+      return '<div class="arow" data-i="'+i+'">'+
+        '<div class="ahead">'+dotHtml(a)+
+          '<input class="inp" data-f="label" type="text" maxlength="'+MAXNAME+'" value="'+esc(a.label)+'" placeholder="Activity name" aria-label="Name of activity '+(i+1)+'">'+
+          '<button class="ibtn" type="button" data-a="up" aria-label="Move '+esc(a.label)+' up"'+(i===0?' disabled':'')+'>▲</button>'+
+          '<button class="ibtn" type="button" data-a="down" aria-label="Move '+esc(a.label)+' down"'+(i===last?' disabled':'')+'>▼</button>'+
+          '<button class="ibtn" type="button" data-a="rm" aria-label="Remove '+esc(a.label)+'">✕</button></div>'+
+        '<div class="step"><button type="button" data-a="min" data-d="-1" aria-label="Fewer minutes"'+(a.mins<=MINM?' disabled':'')+'>−</button><span>'+a.mins+' min</span><button type="button" data-a="min" data-d="1" aria-label="More minutes"'+(a.mins>=MAXM?' disabled':'')+'>+</button></div>'+
+        '<div class="picgrid" role="group" aria-label="Picture">'+PICS.map(function(p){return '<button type="button" class="pg" data-a="pic" data-k="'+p[0]+'" aria-label="'+p[1]+'" aria-pressed="'+(a.k===p[0])+'">'+svg(p[0],'','var(--surface)').replace(/#fff/g,'var(--ink)')+'</button>'}).join('')+'</div>'+
+        '<div class="swatches" role="group" aria-label="Colour">'+COLORS.map(function(c){return '<button type="button" class="sw" data-a="col" data-c="'+c[1]+'" style="background:'+c[1]+'" aria-label="'+c[0]+'" aria-pressed="'+(a.c.toUpperCase()===c[1])+'"></button>'}).join('')+'</div>'+
+        '<label class="fld">We say: "We are …" (optional)<input class="inp" data-f="ing" type="text" maxlength="40" value="'+esc(a.ing)+'" placeholder="e.g. getting dressed"></label>'+
+        (i===0?'<span class="note">Begins when you press Start.</span>':'<label class="fld">Starting this activity<select data-f="pol">'+Object.keys(POL).map(function(k){return '<option value="'+k+'"'+(a.pol===k?' selected':'')+'>'+POL[k]+'</option>'}).join('')+'</select></label>')+
+      '</div>';
+    }).join(''):'<div class="empty">No activities yet.</div>';
+    var full=d.acts.length>=MAXA;
+    $('eAdd').disabled=full;
+    $('eAddNote').textContent=full?'The most you can have is '+MAXA+' activities.':'Up to '+MAXA+' activities.';
+    showErrors();
+  }
+  $('eName').addEventListener('input',function(e){S.draft.name=e.target.value;showErrors()});
+  $('eFinal').onchange=function(e){S.draft.final=e.target.value};
+  $('eSound').onchange=function(e){S.draft.sound=e.target.value};
+  $('eWarn').onchange=function(e){S.draft.warn=e.target.checked};
+  $('eAdd').onclick=function(){
+    var d=S.draft;if(d.acts.length>=MAXA)return;
+    d.acts.push(act('star','','',5,COLORS[d.acts.length%COLORS.length][1],'tap'));
+    renderEditor();
+    var inputs=$('eList').querySelectorAll('input[data-f="label"]');inputs[inputs.length-1].focus();
+  };
+  $('eList').addEventListener('input',function(e){
+    var row=e.target.closest('[data-i]');if(!row||!e.target.dataset.f)return;
+    var a=S.draft.acts[+row.dataset.i];a[e.target.dataset.f]=e.target.value;
+    if(e.target.dataset.f==='label'){var b=row.querySelector('button[data-a="rm"]');if(b)b.setAttribute('aria-label','Remove '+a.label)}
+    showErrors();
+  });
+  $('eList').addEventListener('change',function(e){
+    var row=e.target.closest('[data-i]');if(!row)return;
+    if(e.target.dataset.f==='pol')S.draft.acts[+row.dataset.i].pol=e.target.value;
+  });
+  $('eList').addEventListener('click',function(e){
+    var b=e.target.closest('[data-a]'),row=e.target.closest('[data-i]');if(!b||!row)return;
+    var d=S.draft,i=+row.dataset.i,a=d.acts[i],t=b.dataset.a;
+    if(t==='min')a.mins=Math.min(MAXM,Math.max(MINM,a.mins+ +b.dataset.d));
+    else if(t==='pic')a.k=b.dataset.k;
+    else if(t==='col')a.c=b.dataset.c;
+    else if(t==='rm')d.acts.splice(i,1);
+    else if(t==='up'&&i>0){d.acts.splice(i-1,2,d.acts[i],d.acts[i-1])}
+    else if(t==='down'&&i<d.acts.length-1){d.acts.splice(i,2,d.acts[i+1],d.acts[i])}
+    renderEditor();
+  });
+  $('eTry').onclick=function(){ensureAudio();tone('warn');setTimeout(function(){tone('end')},1200)};
+  $('eCancel').onclick=function(){S.draft=null;go(S.from==='detail'&&byId(S.cur)?'detail':'library')};
+  $('eSave').onclick=function(){
+    var d=S.draft;if(!d||validate(d).length){showErrors();return}   /* an invalid draft is never saved */
+    var out=clone(d);delete out.isNew;
+    out.name=out.name.trim();
+    out.acts.forEach(function(a){a.label=a.label.trim();a.ing=a.ing.trim()});
+    var i=DB.routines.map(function(r){return r.id}).indexOf(out.id);
+    if(i>=0)DB.routines[i]=out;else DB.routines.push(out);
+    save();S.draft=null;go('library');
+  };
+  $('eDel').onclick=function(){
+    if(!S.delArmed){S.delArmed=true;$('eDel').textContent='Tap again to delete for good';return}
+    DB.routines=DB.routines.filter(function(r){return r.id!==S.draft.id});
+    save();S.draft=null;S.delArmed=false;go('library');
+  };
+
+  /* ---------- run: the routine becomes the list R ---------- */
+  var R=[];
+  function buildR(rt){
+    var l=rt.acts.map(function(a){return {k:a.k,label:a.label,ing:a.ing,mins:a.mins,c:a.c,pol:a.pol}});
+    l.push(rt.final==='sleep'
+      ?{k:'sleep',label:'Sleep time',ing:'getting ready to sleep',mins:0,c:'#33448A',pol:'adult',final:true,fade:true,finalWord:'Goodnight',finalSay:'The day is done. Time for sleep.',finalAsk:'Ask: "What was your favourite part of today?"'}
+      :{k:'done',label:'All done',ing:'all done',mins:0,c:'#3E9A62',pol:'adult',final:true,finalWord:'All done!',finalSay:'That is all for now. Well done!',finalAsk:'Ask: "What was the best bit?"'});
+    return l;
+  }
+  function startRoutine(rt){
+    if(!rt)return;
+    R=buildR(rt);S.solo=false;S.sound=rt.sound;S.warn=rt.warn;
+    reset();ensureAudio();go('run');
+  }
+  function dur(i){return R[i].mins*60+(R[i].extra||0)}
+  function progress(){var d=dur(S.idx);return d?Math.min(1,S.el/d):1}
+  function older(){return DB.age==='older'}
+  var STOPS=[[0,[38,182,96]],[.3,[38,182,96]],[.65,[240,180,30]],[1,[224,44,36]]];
+  function tlColour(p){
+    for(var i=1;i<STOPS.length;i++){
+      if(p<=STOPS[i][0]){
+        var a=STOPS[i-1],b=STOPS[i],t=(p-a[0])/(b[0]-a[0]);
+        return 'rgb('+[0,1,2].map(function(k){return Math.round(a[1][k]+(b[1][k]-a[1][k])*t)}).join(',')+')';
+      }
+    }
+    return 'rgb(224,44,36)';
+  }
+  function tlName(p){return p<.4?'green':(p<.9?'yellow':'red')}
+  var run=$('run'),core=$('core'),time=$('time'),next=$('next');
+  function paint(){
+    var a=R[S.idx],p=progress(),m=DB.tl;
+    run.classList.toggle('bgmode',m==='screen'&&!a.final);
+    if(a.final||m==='off'){time.style.background='';core.style.boxShadow='';run.style.background='';return}
+    var col=tlColour(p);
+    if(m==='screen'){
+      var s1=Math.round(34+24*p),s2=Math.round(56+38*p);
+      run.style.background='radial-gradient(circle at 50% 42%,color-mix(in srgb,'+col+' '+s1+'%,var(--stage)) 0%,color-mix(in srgb,'+col+' '+s2+'%,var(--stage)) 100%)';
+      time.style.background='color-mix(in srgb,#fff 42%,transparent)';
+      core.style.boxShadow='0 0 0 4px var(--c)';
+    }else{
+      run.style.background='';
+      time.style.background='color-mix(in srgb,'+col+' 38%,transparent)';
+      core.style.boxShadow='0 0 0 4px var(--c),0 0 0 13px '+col;
+    }
+  }
+  var PRE=[
+    {key:'playground',label:'Playground',ing:'at the playground',k:'swing',c:'#C2468B'},
+    {key:'outside',label:'Outside time',ing:'playing outside',k:'sun',c:'#2E9BB3'},
+    {key:'free',label:'Free play',ing:'playing freely',k:'play',c:'#D98214'},
+    {key:'snack',label:'Snack time',ing:'having a snack',k:'snack',c:'#A8742F'}
+  ];
+  function mkAct(key,mins){var q=PRE.filter(function(x){return x.key===key})[0];return {k:q.k,label:q.label,ing:q.ing,mins:mins,c:q.c,pol:'adult',adhoc:true}}
+  function cleanAdhoc(){if(S.solo)return;for(var i=R.length-1;i>=0;i--)if(R[i].adhoc)R.splice(i,1)}
+  function reset(){cleanAdhoc();R.forEach(function(r){r.extra=0});S.resume=null;S.idx=0;S.el=0;S.phase='active';S.running=true;S.peek=false;S.chimed=false;S.armed=false;stopSound()}
+
+  /* ---------- sound ---------- */
+  var actx=null;
+  function ensureAudio(){
+    try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}catch(e){}
+  }
+  function bell(f,t0,vol,len){
+    [[1,1],[2.01,.22]].forEach(function(h){
+      var o=actx.createOscillator(),g=actx.createGain();
+      o.type='sine';o.frequency.value=f*h[0];o.connect(g);g.connect(actx.destination);
+      g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol*h[1],t0+.03);g.gain.exponentialRampToValueAtTime(.0001,t0+len);
+      o.start(t0);o.stop(t0+len+.05);
+    });
+  }
+  function tone(kind){
+    if(!actx)return;
+    var t=actx.currentTime+.02;
+    if(kind==='warn'){bell(523.25,t,.12,1.6)}
+    else{[523.25,659.25,783.99,1046.5].forEach(function(f,i){bell(f,t+i*.28,.16,2.2)})}
+  }
+  function stopSound(){clearInterval(S.sndTimer);S.sndTimer=null}
+  function endSound(){
+    stopSound();
+    if(S.sound==='off')return;
+    tone('end');
+    if(S.sound==='repeat')S.sndTimer=setInterval(function(){if(S.phase==='transition'&&S.view==='run')tone('end');else stopSound()},20000);
+  }
+
+  /* ---------- run screen ---------- */
+  function nextAct(){return S.resume?R[S.resume.idx]:R[S.idx+1]}
+  function resumeInterrupted(){
+    var r=S.resume;if(!r)return;
+    stopSound();
+    R.splice(S.idx,1);
+    S.idx=r.idx;S.el=r.el;S.resume=null;S.phase='active';S.peek=false;S.armed=false;S.running=true;
+    S.chimed=progress()>=.85;
+    render();
+  }
+  function canChildStart(){
+    if(S.resume)return false;
+    var n=R[S.idx+1];if(!n||S.phase!=='transition')return false;
+    return n.pol==='tap'||(n.pol==='unlock'&&S.armed);
+  }
+  function advance(){
+    if(S.resume){resumeInterrupted();return}
+    if(S.idx>=R.length-1)return;
+    stopSound();
+    S.idx++;S.el=0;S.peek=false;S.chimed=false;S.armed=false;
+    S.phase=R[S.idx].final?'final':'active';
+    render();
+  }
+  function clearConfetti(){$('confetti').innerHTML=''}
+  function confetti(){
+    clearConfetti();
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    var cols=COLORS.map(function(c){return c[1]}).concat(['#C2468B','#F0B41E']),h='';
+    for(var i=0;i<240;i++){
+      var w=8+Math.random()*8;
+      h+='<i style="--x:'+(Math.random()*100).toFixed(1)+'%;--w:'+w.toFixed(1)+'px;--h:'+(w*(1+Math.random()*.8)).toFixed(1)+'px;--k:'+cols[i%cols.length]+
+        ';--d:'+(1.5+Math.random()*.4).toFixed(2)+'s;--dl:'+(Math.random()*3.1).toFixed(2)+'s;--dx:'+(Math.random()*120-60).toFixed(0)+'px;--r:'+(Math.random()*900-450).toFixed(0)+'deg"></i>';
+    }
+    $('confetti').innerHTML=h;
+    clearTimeout(S.confT);S.confT=setTimeout(clearConfetti,5200);
+  }
+  function render(){
+    if(S.view!=='run')return;
+    var a=R[S.idx],n=nextAct(),p=progress(),ol=older();
+    run.style.setProperty('--c',a.c);
+    run.classList.toggle('fade',!!(a.final&&a.fade));
+    if(S.phase==='final'&&a.k==='done'){if(!S.celebrated){S.celebrated=true;confetti()}}else{S.celebrated=false;clearConfetti()}
+    core.innerHTML=svg(a.k,'ic');
+    $('word').textContent=S.phase==='final'?(a.finalWord||'Goodnight'):a.label;
+    time.style.visibility=a.final?'hidden':'visible';
+    time.style.setProperty('--s',a.final?.46:(.46+.54*(1-p)));
+    paint();
+    run.classList.toggle('winding',(p>.85&&S.phase==='active')||S.phase==='transition');
+
+    var show=!!n&&(ol||S.peek||S.phase==='transition');
+    next.hidden=!show;
+    if(n){
+      next.style.setProperty('--n',n.c);
+      $('nextBub').innerHTML=svg(n.k);
+      $('nextWord').textContent=n.label;
+    }
+    var go=S.phase==='transition';
+    next.classList.toggle('go',go);
+    next.classList.toggle('tappable',canChildStart());
+    var h='';
+    if(go)h=S.resume?'All done! Back to '+n.label.toLowerCase()+' in a moment.':(canChildStart()?'All done! Tap what comes next.':'All done! Your grown-up will help.');
+    $('hint').textContent=h;
+    $('gate').classList.toggle('needed',go&&!canChildStart()&&!S.resume);
+
+    var nowI=S.idx;
+    if(S.resume)nowI=S.resume.idx;else while(nowI>0&&R[nowI].adhoc)nowI--;
+    $('strip').innerHTML=(ol&&!S.solo)?R.map(function(r,i){
+      if(r.adhoc)return '';
+      return '<span class="pip'+(i===nowI?' now':'')+(i<nowI?' done':'')+'" style="--pc:'+r.c+'">'+svg(r.k,'',r.c)+'</span>';
+    }).join(''):'';
+
+    updateSay();
+    $('sayAsk').textContent=S.phase==='transition'?'Ask: "Can you show me what is next?"':(S.phase==='final'?(a.finalAsk||''):'Ask: "Is the circle big or small now? What comes after this?"');
+    updateLeft();
+    $('bPause').textContent=S.running?'Pause':'Resume';
+    $('bPeek').hidden=ol||!n||S.phase==='transition';
+    $('bPeek').textContent=S.peek?"Hide what's next":"Show what's next";
+    var needArm=n&&n.pol==='unlock'&&S.phase==='transition'&&!S.resume;
+    $('bArm').hidden=!needArm;
+    $('bArm').textContent=S.armed?'Child can start next':'Let child start next';
+    $('bSkip').disabled=!n;
+    $('bSkip').textContent=n?(S.resume?'Back to '+n.label.toLowerCase()+' now':(n.final&&n.k==='done'?'Finish':'Start '+n.label.toLowerCase())):'Last activity';
+    $('quick').hidden=!!a.final;
+    $('qelse').hidden=!!a.adhoc;
+  }
+  function updateSay(){
+    var a=R[S.idx],n=nextAct(),p=progress(),tl=DB.tl;
+    var now=S.phase==='final'?(a.finalSay||''):(a.ing?'We are '+a.ing+'.':'Now it is '+a.label.toLowerCase()+'.');
+    var tail='';
+    if(S.phase==='active'&&n)tail=' The big circle is getting smaller'+(tl!=='off'?' and the '+(tl==='screen'?'screen':'ring')+' is '+tlName(p)+'. When it is red, we are out of time.':'. When it is small, '+n.label.toLowerCase()+' comes next.');
+    if(S.phase==='transition')tail=(tl!=='off'?' It is red. We are out of time.':' The circle is all gone.')+' Now it is '+n.label.toLowerCase()+'.';
+    $('sayNow').textContent=now+tail;
+  }
+  function updateLeft(){
+    var a=R[S.idx],rem=Math.max(0,dur(S.idx)-S.el);
+    $('left').textContent=a.final?'':(S.phase==='transition'?'Time is up':'About '+Math.ceil(rem/60)+' min left (grown-up only)');
+  }
+  /* prototype only: the native app derives time from a monotonic timestamp, not ticks */
+  setInterval(function(){
+    if(S.view!=='run')return;
+    if(S.phase==='transition'&&S.resume&&performance.now()-S.transAt>=5000){resumeInterrupted();return}
+    if(!S.running||S.phase!=='active')return;
+    S.el+=.1*S.speed;
+    var p=progress();
+    if(p>=1){S.phase='transition';S.transAt=performance.now();endSound();render();return}
+    if(p>=.85&&!S.chimed){S.chimed=true;if(S.warn&&S.sound!=='off')tone('warn');render();return}
+    time.style.setProperty('--s',.46+.54*(1-p));
+    paint();updateSay();updateLeft();
+  },100);
+
+  /* ---------- child's next tap (act on release) ---------- */
+  function onTap(el,fn){
+    el.addEventListener('pointerup',function(e){e.preventDefault();fn()});
+    el.addEventListener('click',function(e){if(e.detail===0)fn()});
+  }
+  onTap(next,function(){if(canChildStart())advance()});
+  run.addEventListener('pointerdown',function(e){
+    if(!e.target.closest('#next')||canChildStart())return;
+    var h=$('hint');
+    h.textContent=S.phase==='transition'?'Your grown-up will help with this one.':'Not yet. Watch the circle get small.';
+    clearTimeout(h._t);h._t=setTimeout(render,2500);
+  });
+
+  /* ---------- grown-up gate and sheet ---------- */
+  var gate=$('gate'),gT=null;
+  function holdStart(e){e.preventDefault();gate.classList.add('hold');clearTimeout(gT);gT=setTimeout(function(){gate.classList.remove('hold');openSheet()},1200)}
+  function holdEnd(){clearTimeout(gT);gate.classList.remove('hold')}
+  gate.addEventListener('pointerdown',holdStart);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(t){gate.addEventListener(t,holdEnd)});
+  gate.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openSheet()}});
+  function openSheet(){stopSound();$('sheet').classList.add('on');$('scrim').classList.add('on');render()}
+  function closeSheet(){$('sheet').classList.remove('on');$('scrim').classList.remove('on')}
+  $('scrim').onclick=closeSheet;$('bClose').onclick=closeSheet;
+  $('bPause').onclick=function(){S.running=!S.running;render()};
+  $('bPeek').onclick=function(){S.peek=!S.peek;render()};
+  $('bArm').onclick=function(){S.armed=!S.armed;render()};
+  $('bSkip').onclick=function(){advance();closeSheet()};
+  $('bRestart').onclick=function(){reset();render();closeSheet()};
+  $('bSetup').onclick=function(){go('library')};
+
+  /* ---------- quick timer ---------- */
+  function fillQuick(actSel,minSel){
+    actSel.innerHTML=PRE.map(function(q){return '<option value="'+q.key+'">'+q.label+'</option>'}).join('');
+    minSel.innerHTML=[5,10,15,20,30].map(function(m){return '<option value="'+m+'">'+m+' min</option>'}).join('');
+  }
+  fillQuick($('qAct'),$('qMin'));fillQuick($('qActS'),$('qMinS'));
+  function startElse(mins,a){
+    if(R[S.idx].adhoc)return;
+    a.mins=mins;a.adhoc=true;
+    stopSound();
+    S.resume=S.phase==='active'?{idx:S.idx,el:S.el}:null;
+    R.splice(S.idx+1,0,a);
+    S.idx++;S.el=0;S.phase='active';S.peek=false;S.chimed=false;S.armed=false;S.running=true;
+    closeSheet();render();
+  }
+  function moreTime(mins){
+    var cur=R[S.idx];if(cur.final)return;
+    cur.extra=(cur.extra||0)+mins*60;
+    if(S.phase==='transition'){S.phase='active';stopSound()}
+    S.chimed=progress()>=.85;
+    closeSheet();render();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.qmore'),function(b){b.onclick=function(){moreTime(+b.dataset.m)}});
+  $('qGo').onclick=function(){startElse(+$('qMin').value,mkAct($('qAct').value,+$('qMin').value))};
+  $('qGoS').onclick=function(){
+    var a=mkAct($('qActS').value,+$('qMinS').value);
+    var done={k:'done',label:'All done',ing:'all done',mins:0,c:'#3E9A62',pol:'tap',final:true,finalWord:'All done!',finalSay:'That is all for now. Well done!',finalAsk:'Ask: "What was the best bit?"'};
+    R=[a,done];S.solo=true;S.sound='chime';S.warn=true;
+    S.resume=null;S.idx=0;S.el=0;S.phase='active';S.running=true;S.peek=false;S.chimed=false;S.armed=false;
+    ensureAudio();go('run');
+  };
+
+  /* ---------- demo helpers ---------- */
+  $('dEnd').onclick=function(){if(S.view!=='run'||S.phase!=='active')return;S.el=Math.max(S.el,dur(S.idx)-5);render()};
+  $('dArm').onclick=function(){var n=R[S.idx+1];if(S.view!=='run'||S.resume||!n||S.phase!=='transition'||n.pol!=='unlock')return;S.armed=true;render()};
+  $('dReset').onclick=function(){DB.routines=defaults();save();go('library')};
+  $('speed').onchange=function(e){S.speed=+e.target.value};
+
+  go('library');
+})();
+</script>

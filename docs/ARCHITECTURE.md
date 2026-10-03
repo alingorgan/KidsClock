@@ -26,7 +26,7 @@ module) are in `docs/adr/0003-module-boundaries.md`.
 | `app` | Android application | `MainActivity`, wiring (manual DI, a small `AppContainer` when needed). |
 | `build-logic/convention` | included build | Convention plugins: `kidsclock.kotlin.jvm`, `.android.library`, `.android.application`, `.android.compose`, `.feature.api`, `.feature.impl`, `.android.snapshot`, `.android.accessibility`, `.android.uitest`, `.quality`, `.dependency.rules` (root only). Versions and SDK levels live here and in `gradle/libs.versions.toml`. |
 
-Planned, not created yet: `core/data` (persistence, media store), `core/platform` (keep-awake, alerts, audio focus, lock task — the first one built the moment something needs it, ADR 0004), `feature/setup` (`api`/`impl`).
+Built: `core/data` (the routine store: `RoutineStore`, a text record over app-private `SharedPreferences`, `RoutineRepository` with its example-routine fallback; the media store is still to come), `feature/routines` (library, preview and editor, decisions 33-36). Planned, not created yet: `core/platform` (keep-awake, alerts, audio focus, lock task — the first one built the moment something needs it, ADR 0004).
 
 ## Dependency rules
 ```

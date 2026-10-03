@@ -56,7 +56,7 @@ Claude, since it is a curl-pipe-to-shell installer). Flows live in `.maestro/`.
 maestro test .maestro/smoke.yaml
 ```
 
-`smoke.yaml` launches the app and asserts `run.screen` and `run.title` are visible. Add a flow per
+`smoke.yaml` launches the app (on the routines list), opens the Morning example, starts it, and asserts `run.screen` and `run.title` are visible. Routines screens use `routines.library.*`, `routines.preview.*` and `routines.editor.*` ids; the run sheet scrolls, so its lower buttons (`run.sheet.exit`, `run.sheet.close`) are absent from a `uiautomator dump` until scrolled into view. Add a flow per
 user-visible behaviour once there is more than one screen; keep ids as the only selector (never
 match on translated text).
 

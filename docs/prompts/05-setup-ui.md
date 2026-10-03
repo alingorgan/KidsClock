@@ -1,4 +1,4 @@
-# Prompt 05: Setup UI, first slice (Phase 3, part 3)
+# Prompt 05: Routines library and editor, first slice (Phase 3, part 3)
 
 Paste this into a fresh Claude Code session at the repo root.
 
@@ -10,7 +10,7 @@ one hardcoded routine (`DEFAULT_EVENING_ROUTINE`) with the gate and sheet, start
 the nearly-done note, breathing, repeat mode and reduced motion. A debug-only "KidsClock fast" launcher
 makes a minute last one second. Decision 31 means a *run* is not persisted (a kill or reboot restarts the
 routine); decision 25 means the **routine itself persists**. This slice adds the caregiver's **setup
-screen**: choosing and editing the routine, and the sound options. It does **not** add media, the age
+screen**: choosing, previewing and editing **saved routines**, and the sound options. It does **not** add media, the age
 setting, or the other progress-colour modes unless I say so in answer to the questions below.
 
 ## Read first (in order)
@@ -21,8 +21,9 @@ setting, or the other progress-colour modes unless I say so in answer to the que
 4. `docs/OPEN_QUESTIONS.md` — do not guess anything still open; ask.
 5. `docs/adr/0002-ui-architecture.md`, `0003-module-boundaries.md`, `0004-third-party-isolation.md`,
    `docs/DESIGN_SYSTEM.md`, `docs/UI_AUTOMATION.md`.
-6. `prototype/now-next-v2.html` — behaviour reference only (its setup panel is the nearest thing to a
-   design; do not translate it line by line; its demo scaffolding must not appear).
+6. `prototype/now-next-v3.html` — behaviour reference for the library, preview and editor (do not
+   translate it line by line; its demo helpers, side panel and tick timer must not appear).
+   `now-next-v2.html` is the older single-routine version.
 
 ## What already exists — do not redo it
 - `core/model`: `Routine` (`activities`, `final`, `minuteMillis`, `sound: SoundSettings`), `Activity`,
@@ -32,7 +33,8 @@ setting, or the other progress-colour modes unless I say so in answer to the que
   `KcBreathing`, `rememberKcFade`, `KcTheme` tokens (including `reduceMotion`).
 - `core/platform`: `AlertPlayer` (chime and nearly-done note), `AndroidClock`, `LockTaskController`.
 - `feature/run/{api,impl}`, `app` (`AppContainer`, `MainActivity`, the fast launcher alias).
-- Scaffold a new feature with `scripts/new-feature.sh setup` (both modules, registered, baselines
+- Scaffold new features with `scripts/new-feature.sh routines` (library, preview) and, if it keeps the
+  modules small, `setup` (editor); decide and say which (both modules, registered, baselines
   recorded). It never wires the feature into `app`: that wiring is part of this slice.
 
 Lessons that apply (they cost time before):
@@ -45,33 +47,36 @@ Lessons that apply (they cost time before):
 - Import order is enforced by ktlint (`./gradlew ktlintFormat` before `check`).
 - With two devices attached, install with `ANDROID_SERIAL=<serial> ./gradlew :app:installDebug`.
 
-## Questions — ask me before building, then record the answers in `docs/DECISIONS.md`
-1. **Where does setup live?** My leaning: the app opens on the Run screen as now, and setup is reached
-   from the grown-up sheet ("Edit routine"), so the child never lands in it. Alternatives: a launch
-   screen, or both. And what happens to a run in progress when the routine is saved (my leaning:
-   the routine restarts from the beginning, consistent with decision 31).
-2. **What is an activity in setup?** (a) Pick from presets with fixed names, colours and, later,
-   pictograms; (b) a free-text name plus one of the six SPEC §12 colours. (b) needs a text field block and
-   a "We are ..." phrase (today `doing`). My leaning: (b) with the phrase defaulting to the lower-cased
-   name, but ask.
-3. **Scope of this slice.** My proposal: edit the list (add, remove, reorder, up to a limit), each
-   activity's duration and start policy, the final item, and the sound options (SPEC §7: gentle,
-   repeating, none; nearly-done note). **Out:** age setting and the under-3 behaviour, the two other
-   progress-colour modes, photos and clips, the day strip, the kiosk "App pinning" setup step
-   (decision 17), TalkBack polish. Confirm or change.
-4. **Limits and steps.** Duration range and step (my leaning: whole minutes, 1–60, step 1), maximum
-   number of activities (my leaning: 8), the first activity has no start policy (SPEC §8), the final item's
-   choices (Sleep time with the fade, or "All done!" with no fade).
-5. **Storage.** The routine is small. A library (DataStore, kotlinx.serialization) or a hand-written
-   mapping over `SharedPreferences`? Give your recommendation and wait for a yes before adding any
-   dependency. My leaning: no new dependency. Store **whole minutes**, not milliseconds, so the fast
-   launcher still scales them via `minuteMillis`.
-6. **"Quick timer only"** (SPEC §10: no routine, pick an activity and minutes, then an "All done!" check
-   mark the child can tap). In this slice or the next? My leaning: next.
+## Answered (owner, 2026-10-03; recorded as decisions 33-36). Do not re-ask.
+The design changed from one setup screen to a **library of saved routines**, prototyped first in
+`prototype/now-next-v3.html` (open it; it is the behaviour reference for this slice).
+1. **Entry point.** The app opens on the **Routines list** (always with "+ New routine"). Tap a routine
+   for a read-only **preview** (activities, minutes, start policy, last screen, sound) with Start, Edit,
+   Duplicate, Back. Edit is its own screen (Save/Cancel, Delete asks twice). Starting a routine starts
+   the run from the beginning; "Back to routines" in the sheet leaves it (decision 31: runs are not persisted).
+2. **Activity** = free-text name + one pictogram from a built-in set + one of the six colours + optional
+   "We are ..." phrase (falls back to "Now it is <name>").
+3. **Scope.** In: many routines (create, preview, edit, duplicate, delete), up to 8 activities (add,
+   remove, reorder), minutes 1-60 step 1, start policy (not on the first), per-routine last screen
+   ("All done!" or "Sleep time" with the fade) and per-routine sound (SPEC §7). Age and progress colour are
+   app-wide, **shown on the list but not built here** beyond what already exists. Out: age behaviour,
+   other colour modes, photos/clips, day strip changes, "App pinning" setup step, TalkBack polish.
+4. **Limits.** As in the prototype: 8 activities, 1-60 min, names up to 30 characters, non-blank; routine
+   needs a name and at least one activity.
+5. **Storage.** Hand-written `SharedPreferences`, no new dependency, behind a `RoutineStore` interface in
+   a new `core/data` module. A versioned record holding **all routines** and the selected-nothing state;
+   whole minutes. Missing, corrupt, newer-version or invalid entries are dropped; if none survive, the
+   two example routines (SPEC §12: Evening, Morning) are used.
+6. **"Quick timer only"** stays where it is in the prototype (a footer on the list) but is **next slice**
+   natively. Do not build it here.
+
+Still ask me about anything not covered above (for example, whether the first launch should show the
+examples or an empty list on a real device, and the exact pictogram art for the new icons).
 
 ## Scope (assuming my leanings; adjust to my answers)
 **In scope**
-1. **Pure editing logic in `core/model`.** An editable routine draft with operations (add, remove, move,
+1. **Pure editing logic in `core/model`.** A routine library (list of routines with add, duplicate,
+   delete) and an editable routine draft with operations (add, remove, move,
    rename, set duration, set policy, set colour, set final item, set sound) and validation (at least one
    activity, limits, non-blank names), each returning a new draft. Mapping between the draft and the stored
    form, with a **version number** so a newer or corrupt record is discarded and the default routine is
@@ -84,9 +89,9 @@ Lessons that apply (they cost time before):
    one-shot effects via a `Channel`), a stateless `SetupScreen`, `Kc*` blocks as needed (list row, number
    stepper, switch or checkbox, text field), each with a required `testTag` (`setup.<element>`),
    `contentDescription` on icon-only controls and a `<File>SnapshotTest`.
-4. **Wiring in `app`**: reachable from the grown-up sheet; Save returns to Run with the new routine, run
-   restarted; Cancel returns without change. `RunViewModelFactory` takes the stored routine (still scaled
-   by the fast launcher).
+4. **Wiring in `app`**: the Routines list is the start destination; Start opens Run with that routine
+   (still scaled by the fast launcher); "Back to routines" in the sheet returns; Save returns to the list;
+   Cancel changes nothing.
 5. User-visible text in string resources. No hard-coded colours or dp values in features.
 
 **Out of scope — ask before touching:** anything listed under Out in question 3, any change to run
