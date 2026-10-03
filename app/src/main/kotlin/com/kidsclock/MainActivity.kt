@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.kidsclock.core.designsystem.KidsClockTheme
-import com.kidsclock.feature.run.RunRoute
 
 class MainActivity : ComponentActivity() {
     private val appContainer by lazy { AppContainer(applicationContext, fastMode = isFastModeLaunch()) }
@@ -19,13 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContent {
-            KidsClockTheme {
-                RunRoute(
-                    viewModelFactory = appContainer.runViewModelFactory,
-                    onPlayChime = { appContainer.alertPlayer.playChime() },
-                    onPlayNearlyDone = { appContainer.alertPlayer.playNearlyDone() },
-                )
-            }
+            KidsClockTheme { AppRoot(appContainer) }
         }
     }
 }

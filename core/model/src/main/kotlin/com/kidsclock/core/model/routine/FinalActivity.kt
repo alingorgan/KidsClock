@@ -7,4 +7,7 @@ data class FinalActivity(
     val startPolicy: StartPolicy = StartPolicy.ChildTaps,
     /** Decision 23: entering this item fades the whole screen to near-black, with no chime. */
     val fadesToDark: Boolean = false,
+    val pictogram: Pictogram = if (fadesToDark) Pictogram.Sleep else Pictogram.Done,
+    /** SPEC §5: "All done!" is celebrated with confetti when it appears. */
+    val celebrates: Boolean = false,
 )

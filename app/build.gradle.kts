@@ -18,8 +18,11 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:platform"))
+    implementation(project(":core:data"))
     implementation(project(":feature:run:impl"))
+    implementation(project(":feature:routines:impl"))
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 }
 
 // Guardrail: privacy rule. The merged manifest must never request INTERNET.

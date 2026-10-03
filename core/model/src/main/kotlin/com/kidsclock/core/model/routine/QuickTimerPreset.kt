@@ -6,11 +6,12 @@ enum class QuickTimerPreset(
     /** The grown-up's "We are ..." phrase. */
     val doing: String,
     val color: ActivityColor,
+    val pictogram: Pictogram,
 ) {
-    Playground("Playground", "at the playground", ActivityColor.Magenta),
-    OutsideTime("Outside time", "playing outside", ActivityColor.Sky),
-    FreePlay("Free play", "playing freely", ActivityColor.Amber),
-    SnackTime("Snack time", "having a snack", ActivityColor.Brown),
+    Playground("Playground", "at the playground", ActivityColor.Magenta, Pictogram.Playground),
+    OutsideTime("Outside time", "playing outside", ActivityColor.Sky, Pictogram.Outside),
+    FreePlay("Free play", "playing freely", ActivityColor.Amber, Pictogram.Play),
+    SnackTime("Snack time", "having a snack", ActivityColor.Brown, Pictogram.Snack),
     ;
 
     fun toActivity(
@@ -23,6 +24,7 @@ enum class QuickTimerPreset(
             durationMillis = minutes * minuteMillis,
             color = color,
             doing = doing,
+            pictogram = pictogram,
         )
 }
 

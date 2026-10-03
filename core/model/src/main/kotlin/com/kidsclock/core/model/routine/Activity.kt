@@ -9,4 +9,6 @@ data class Activity(
     val startPolicy: StartPolicy = StartPolicy.ChildTaps,
     /** The grown-up's "We are ..." phrase (SPEC §9 "Say together"), e.g. "playing". */
     val doing: String = name.lowercase(),
+    /** SPEC §12: the picture inside the activity bubble. */
+    val pictogram: Pictogram = Pictogram.Star,
 )

@@ -2,6 +2,7 @@ package com.kidsclock.feature.run
 
 import com.kidsclock.core.model.routine.Activity
 import com.kidsclock.core.model.routine.ActivityColor
+import com.kidsclock.core.model.routine.Pictogram
 import com.kidsclock.core.model.routine.QuickTimerPreset
 import com.kidsclock.core.model.routine.StartPolicy
 import com.kidsclock.core.model.run.RunState
@@ -23,9 +24,11 @@ sealed interface RunUiState {
         /** The grown-up's "We are ..." phrase, e.g. "playing". */
         val activityDoing: String,
         val activityColor: ActivityColor,
+        val activityPictogram: Pictogram = Pictogram.Star,
         val nextActivityName: String,
         /** Null when the next item is the final activity, which has no activity colour. */
         val nextActivityColor: ActivityColor?,
+        val nextActivityPictogram: Pictogram = Pictogram.Done,
         val progress: Double,
         val phase: Phase,
         val paused: Boolean = false,
@@ -56,6 +59,9 @@ sealed interface RunUiState {
         val prompt: String,
         /** Decision 23: the screen fades to near-black, with no chime. */
         val fadesToDark: Boolean = false,
+        val pictogram: Pictogram = Pictogram.Sleep,
+        /** SPEC §5: "All done!" shows confetti when it appears. */
+        val celebrates: Boolean = false,
         override val sheetOpen: Boolean = false,
     ) : RunUiState
 }
@@ -92,6 +98,8 @@ fun RunState.toUiState(
             RunUiState.Final(
                 prompt = routine.final.prompt,
                 fadesToDark = routine.final.fadesToDark,
+                pictogram = routine.final.pictogram,
+                celebrates = routine.final.celebrates,
                 sheetOpen = sheetOpen,
             )
     }
@@ -117,8 +125,10 @@ private fun running(
         activityName = activity.name,
         activityDoing = activity.doing,
         activityColor = activity.color,
+        activityPictogram = activity.pictogram,
         nextActivityName = next?.name ?: routine.final.name,
         nextActivityColor = next?.color,
+        nextActivityPictogram = next?.pictogram ?: routine.final.pictogram,
         progress = progress,
         phase = phase,
         nextIsInterrupted = interrupted != null,

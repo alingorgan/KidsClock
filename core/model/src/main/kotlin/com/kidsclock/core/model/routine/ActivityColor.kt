@@ -13,4 +13,10 @@ enum class ActivityColor {
     Magenta,
     Sky,
     Brown,
+    ;
+
+    companion object {
+        /** The six colours the grown-up can pick (SPEC §12); the rest are quick-timer presets only. */
+        val palette: List<ActivityColor> = listOf(Amber, Green, Blue, Teal, Purple, Indigo)
+    }
 }

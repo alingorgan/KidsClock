@@ -5,7 +5,14 @@ fun eveningRoutine(minuteMillis: Long = REAL_MINUTE_MILLIS): Routine =
     Routine(
         activities =
             listOf(
-                Activity("playtime", "Playtime", 8 * minuteMillis, ActivityColor.Amber, doing = "playing"),
+                Activity(
+                    "playtime",
+                    "Playtime",
+                    8 * minuteMillis,
+                    ActivityColor.Amber,
+                    doing = "playing",
+                    pictogram = Pictogram.Play,
+                ),
                 Activity(
                     "tidy-up",
                     "Tidy up",
@@ -13,6 +20,7 @@ fun eveningRoutine(minuteMillis: Long = REAL_MINUTE_MILLIS): Routine =
                     ActivityColor.Green,
                     StartPolicy.ChildTaps,
                     "tidying up",
+                    Pictogram.Tidy,
                 ),
                 Activity(
                     "bath-time",
@@ -21,6 +29,7 @@ fun eveningRoutine(minuteMillis: Long = REAL_MINUTE_MILLIS): Routine =
                     ActivityColor.Blue,
                     StartPolicy.GrownUpUnlocksThenChildTaps,
                     "having a bath",
+                    Pictogram.Bath,
                 ),
                 Activity(
                     "brush-teeth",
@@ -29,6 +38,7 @@ fun eveningRoutine(minuteMillis: Long = REAL_MINUTE_MILLIS): Routine =
                     ActivityColor.Teal,
                     StartPolicy.ChildTaps,
                     "brushing teeth",
+                    Pictogram.Teeth,
                 ),
                 Activity(
                     "story-time",
@@ -37,6 +47,7 @@ fun eveningRoutine(minuteMillis: Long = REAL_MINUTE_MILLIS): Routine =
                     ActivityColor.Purple,
                     StartPolicy.GrownUpOnly,
                     "reading a story",
+                    Pictogram.Story,
                 ),
             ),
         final =

@@ -3,6 +3,7 @@ package com.kidsclock.feature.run
 import com.kidsclock.core.model.routine.Activity
 import com.kidsclock.core.model.routine.ActivityColor
 import com.kidsclock.core.model.routine.FinalActivity
+import com.kidsclock.core.model.routine.Pictogram
 import com.kidsclock.core.model.routine.QuickTimerPreset
 import com.kidsclock.core.model.routine.Routine
 import com.kidsclock.core.model.routine.StartPolicy
@@ -119,7 +120,7 @@ class RunUiStateTest {
     fun finalShowsItsPromptAndTheSheetFlagPassesThrough() {
         val ui = RunState.Final(routine()).toUiState(now = 0L, sheetOpen = true)
 
-        assertEquals(RunUiState.Final(prompt = "Goodnight", sheetOpen = true), ui)
+        assertEquals(RunUiState.Final(prompt = "Goodnight", pictogram = Pictogram.Done, sheetOpen = true), ui)
     }
 
     @Test
@@ -248,5 +249,41 @@ class RunUiStateTest {
         val paused = RunState.Active(eveningRoutine(1_000L), 0, 0L, pausedAtElapsed = 7_000L)
         assertEquals(false, running(paused, now = 7_500L).nearlyDone)
         assertEquals(false, running(RunState.Transition(eveningRoutine(1_000L), 0), now = 8_000L).nearlyDone)
+    }
+
+    @Test
+    fun spec12_pictogramsFlowToTheActivityAndTheNextTile() {
+        val r =
+            Routine(
+                activities =
+                    listOf(
+                        Activity("a", "Hair", minute, ActivityColor.Indigo, pictogram = Pictogram.Hair),
+                        Activity("b", "Leave", minute, ActivityColor.Green, pictogram = Pictogram.Leave),
+                    ),
+                final = FinalActivity("All done", "All done!", celebrates = true),
+            )
+        val ui = running(RunState.Active(r, 0, startedAtElapsed = 0L), now = 0L)
+
+        assertEquals(Pictogram.Hair, ui.activityPictogram)
+        assertEquals(Pictogram.Leave, ui.nextActivityPictogram)
+        val last = running(RunState.Active(r, 1, startedAtElapsed = 0L), now = 0L)
+        assertEquals(Pictogram.Done, last.nextActivityPictogram)
+    }
+
+    @Test
+    fun spec05_allDoneCelebratesAndSleepTimeDoesNot() {
+        val allDone =
+            RunState.Final(
+                Routine(routine().activities, FinalActivity("All done", "All done!", celebrates = true)),
+            )
+        val sleep =
+            RunState.Final(
+                Routine(routine().activities, FinalActivity("Sleep time", "Goodnight", fadesToDark = true)),
+            )
+
+        assertEquals(true, (allDone.toUiState(0L) as RunUiState.Final).celebrates)
+        assertEquals(Pictogram.Done, (allDone.toUiState(0L) as RunUiState.Final).pictogram)
+        assertEquals(false, (sleep.toUiState(0L) as RunUiState.Final).celebrates)
+        assertEquals(Pictogram.Sleep, (sleep.toUiState(0L) as RunUiState.Final).pictogram)
     }
 }

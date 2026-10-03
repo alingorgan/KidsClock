@@ -7,6 +7,7 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import com.kidsclock.core.designsystem.KidsClockTheme
 import com.kidsclock.core.designsystem.components.KC_FADE_MILLIS
 import com.kidsclock.core.model.routine.ActivityColor
+import com.kidsclock.core.model.routine.Pictogram
 import com.kidsclock.core.model.routine.QuickTimerPreset
 import org.junit.Rule
 import org.junit.Test
@@ -26,8 +27,10 @@ class RunScreenSnapshotTest {
             activityName = "Playtime",
             activityDoing = "playing",
             activityColor = ActivityColor.Amber,
+            activityPictogram = Pictogram.Play,
             nextActivityName = "Tidy up",
             nextActivityColor = ActivityColor.Green,
+            nextActivityPictogram = Pictogram.Tidy,
             progress = 0.2,
             phase = Phase.Active,
         )
@@ -37,13 +40,16 @@ class RunScreenSnapshotTest {
             activityName = "Playtime",
             activityDoing = "playing",
             activityColor = ActivityColor.Amber,
+            activityPictogram = Pictogram.Play,
             nextActivityName = "Tidy up",
             nextActivityColor = ActivityColor.Green,
+            nextActivityPictogram = Pictogram.Tidy,
             progress = 1.0,
             phase = Phase.Transition,
         )
 
-    private val final = RunUiState.Final(prompt = "Goodnight")
+    private val final = RunUiState.Final(prompt = "Goodnight", fadesToDark = true)
+    private val allDone = RunUiState.Final(prompt = "All done!", pictogram = Pictogram.Done, celebrates = true)
 
     @Test
     fun running_light() {
@@ -99,6 +105,56 @@ class RunScreenSnapshotTest {
             ) { RunScreen(uiState = final, actions = RunActions.None) }
         }
         compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_final_dark.png")
+    }
+
+    @Test
+    fun allDone_light() {
+        compose.setContent {
+            KidsClockTheme(
+                darkTheme = false,
+            ) { RunScreen(uiState = allDone, actions = RunActions.None, confettiProgress = 0.4f) }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_allDone_light.png")
+    }
+
+    @Test
+    fun allDone_dark() {
+        compose.setContent {
+            KidsClockTheme(
+                darkTheme = true,
+            ) { RunScreen(uiState = allDone, actions = RunActions.None, confettiProgress = 0.4f) }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_allDone_dark.png")
+    }
+
+    @Test
+    fun allDone_reducedMotion_light() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false, reduceMotion = true) {
+                RunScreen(uiState = allDone, actions = RunActions.None, confettiProgress = 0.4f)
+            }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_allDone_reducedMotion_light.png")
+    }
+
+    @Test
+    fun sheet_allDone_light() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) {
+                RunScreen(uiState = allDone.copy(sheetOpen = true), actions = RunActions.None, confettiProgress = 0.4f)
+            }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_sheet_allDone_light.png")
+    }
+
+    @Test
+    fun sheet_noPhrase_light() {
+        compose.setContent {
+            KidsClockTheme(darkTheme = false) {
+                RunScreen(uiState = sheetActive.copy(activityDoing = ""), actions = RunActions.None)
+            }
+        }
+        compose.onRoot().captureRoboImage("src/test/snapshots/RunScreen_sheet_noPhrase_light.png")
     }
 
     private val sheetActive = running.copy(sheetOpen = true, minutesLeft = 6)

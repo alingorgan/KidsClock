@@ -26,11 +26,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.kidsclock.core.designsystem.KcTheme
 import com.kidsclock.core.designsystem.components.KcButton
 import com.kidsclock.core.designsystem.components.KcChoice
 import com.kidsclock.core.designsystem.components.KcCircle
+import com.kidsclock.core.designsystem.components.KcConfetti
 import com.kidsclock.core.designsystem.components.KcGate
+import com.kidsclock.core.designsystem.components.KcPictogram
+import com.kidsclock.core.designsystem.components.KcPicture
 import com.kidsclock.core.designsystem.components.KcScreen
 import com.kidsclock.core.designsystem.components.KcSheet
 import com.kidsclock.core.designsystem.components.KcText
@@ -45,6 +49,7 @@ import com.kidsclock.core.model.TrafficName
 import com.kidsclock.core.model.mix
 import com.kidsclock.core.model.progressBubbleScale
 import com.kidsclock.core.model.routine.ActivityColor
+import com.kidsclock.core.model.routine.Pictogram
 import com.kidsclock.core.model.routine.QUICK_TIMER_MINUTES
 import com.kidsclock.core.model.routine.QuickTimerPreset
 import com.kidsclock.core.model.run.MORE_TIME_MINUTES
@@ -67,11 +72,13 @@ fun RunScreen(
     actions: RunActions,
     modifier: Modifier = Modifier,
     hint: Hint? = null,
+    /** Pins one frame of the "All done!" confetti (0..1) instead of animating it; for snapshot tests only. */
+    confettiProgress: Float? = null,
 ) {
     when (uiState) {
         is RunUiState.Running -> RunningContent(uiState, actions, hint, modifier)
         is RunUiState.Final ->
-            FinalContent(uiState, actions, modifier)
+            FinalContent(uiState, actions, modifier, confettiProgress)
     }
 }
 
@@ -81,6 +88,7 @@ private fun FinalContent(
     state: RunUiState.Final,
     actions: RunActions,
     modifier: Modifier,
+    confettiProgress: Float?,
 ) {
     val fade = rememberKcFade(active = state.fadesToDark)
     val colors = KcTheme.colors
@@ -89,12 +97,29 @@ private fun FinalContent(
         modifier = modifier,
         background = SolidColor(lerp(colors.stage, colors.fadeStage, fade)),
     ) {
-        KcText(
-            text = state.prompt,
-            testTag = "run.title",
-            style = KcTextStyle.Title,
-            color = lerp(colors.ink, colors.fadeInk, fade),
-        )
+        val bubble = if (state.celebrates) colors.activity.green else colors.activity.indigo
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(KcTheme.spacing.m),
+        ) {
+            KcCircle(size = FINAL_BUBBLE, color = bubble, testTag = "run.finalBubble") {
+                KcPictogram(
+                    picture = state.pictogram.toPicture(),
+                    size = FINAL_BUBBLE * PICTURE_SCALE,
+                    cutout = bubble,
+                    testTag = "run.finalPicture",
+                )
+            }
+            KcText(
+                text = state.prompt,
+                testTag = "run.title",
+                style = KcTextStyle.Title,
+                color = lerp(colors.ink, colors.fadeInk, fade),
+            )
+        }
+        if (state.celebrates) {
+            KcConfetti(testTag = "run.confetti", modifier = Modifier.fillMaxSize(), progress = confettiProgress)
+        }
         GrownUpGate(needed = false, onOpen = actions.onGateOpen)
         GrownUpSheet(state, actions)
     }
@@ -144,7 +169,14 @@ private fun RunningContent(
                             color = state.activityColor.toColor(),
                             testTag = "run.activityBubble",
                             modifier = Modifier.kcBreathing(state.nearlyDone),
-                        )
+                        ) {
+                            KcPictogram(
+                                picture = state.activityPictogram.toPicture(),
+                                size = orbSize * ACTIVITY_BUBBLE_SCALE.toFloat() * PICTURE_SCALE,
+                                cutout = state.activityColor.toColor(),
+                                testTag = "run.activityPicture",
+                            )
+                        }
                     }
                 }
                 KcText(text = state.activityName, testTag = "run.title", style = KcTextStyle.Title)
@@ -215,13 +247,19 @@ private fun BoxScope.GrownUpSheet(
         when (state) {
             is RunUiState.Final -> {
                 KcText(
-                    text = stringResource(R.string.sheet_say_final),
+                    text =
+                        stringResource(
+                            if (state.celebrates) R.string.sheet_say_all_done else R.string.sheet_say_final,
+                        ),
                     testTag = "run.sheet.say",
                     modifier = SheetFill,
                     align = KcTextAlign.Start,
                 )
                 KcText(
-                    text = stringResource(R.string.sheet_ask_final),
+                    text =
+                        stringResource(
+                            if (state.celebrates) R.string.sheet_ask_all_done else R.string.sheet_ask_final,
+                        ),
                     testTag = "run.sheet.ask",
                     modifier = SheetFill,
                     align = KcTextAlign.Start,
@@ -229,6 +267,12 @@ private fun BoxScope.GrownUpSheet(
             }
             is RunUiState.Running -> RunningSheetContent(state, actions)
         }
+        KcButton(
+            label = stringResource(R.string.sheet_back_to_routines),
+            testTag = "run.sheet.exit",
+            modifier = SheetFill,
+            onClick = actions.onExit,
+        )
         KcButton(
             label = stringResource(R.string.sheet_close),
             testTag = "run.sheet.close",
@@ -249,6 +293,12 @@ private fun RunningSheetContent(
         text =
             if (transition) {
                 stringResource(R.string.sheet_say_transition, state.nextActivityName.lowercase())
+            } else if (state.activityDoing.isBlank()) {
+                stringResource(
+                    R.string.sheet_say_active_no_phrase,
+                    state.activityName.lowercase(),
+                    trafficColourWord(state.progress),
+                )
             } else {
                 stringResource(R.string.sheet_say_active, state.activityDoing, trafficColourWord(state.progress))
             },
@@ -429,7 +479,14 @@ private fun NextTile(
             size = nextBubbleSize,
             color = state.nextActivityColor?.toColor() ?: KcTheme.colors.inkSecondary,
             testTag = "run.nextBubble",
-        )
+        ) {
+            KcPictogram(
+                picture = state.nextActivityPictogram.toPicture(),
+                size = nextBubbleSize * PICTURE_SCALE,
+                cutout = state.nextActivityColor?.toColor() ?: KcTheme.colors.inkSecondary,
+                testTag = "run.nextPicture",
+            )
+        }
         KcText(text = state.nextActivityName, testTag = "run.nextName", style = KcTextStyle.Body)
     }
 }
@@ -468,5 +525,12 @@ private fun farthestCornerDistance(
         )
     return corners.maxOf { hypot((it.x - centre.x), (it.y - centre.y)) }
 }
+
+/** The picture fills this share of its bubble (the prototype's 62%). */
+private const val PICTURE_SCALE = 0.62f
+
+private val FINAL_BUBBLE = 160.dp
+
+internal fun Pictogram.toPicture(): KcPicture = KcPicture.valueOf(name)
 
 private val SheetFill = Modifier.fillMaxWidth()

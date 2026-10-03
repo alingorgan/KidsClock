@@ -3,6 +3,7 @@ package com.kidsclock
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
@@ -25,20 +26,28 @@ class MainActivitySmokeTest {
     val compose = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun runScreenIsReachableByComposeTestApi() {
+    fun routinesLibraryIsTheFirstScreen() {
+        compose.onNodeWithTag("routines.library").assertIsDisplayed()
+        compose.onNodeWithTag("routines.library.new").assertIsDisplayed()
+    }
+
+    @Test
+    fun startingAnExampleRoutineShowsTheRunScreen() {
+        compose.onNodeWithTag("routines.library.card.example-morning").performClick()
+        compose.onNodeWithTag("routines.preview.start").performClick()
         compose.onNodeWithTag("run.screen").assertIsDisplayed()
         compose.onNodeWithTag("run.title").assertIsDisplayed()
     }
 
     @Test
-    fun runScreenIsReachableByUiAutomatorResourceId() {
+    fun libraryIsReachableByUiAutomatorResourceId() {
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val title =
             device.wait(
                 androidx.test.uiautomator.Until
-                    .findObject(By.res("run.title")),
+                    .findObject(By.res("routines.library.title")),
                 5_000,
             )
-        assertNotNull("UiAutomator (what Maestro drives) could not find resource-id run.title", title)
+        assertNotNull("UiAutomator (what Maestro drives) could not find resource-id routines.library.title", title)
     }
 }

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="routines_library_title">Routines</string>
+    <string name="routines_library_intro">Pick a routine to look it over and start it. Everything stays on this device.</string>
+    <string name="routines_library_empty">No routines yet. Make your first one.</string>
+    <string name="routines_new">+ New routine</string>
+    <plurals name="routines_activities">
+        <item quantity="one">%1$d activity</item>
+        <item quantity="other">%1$d activities</item>
+    </plurals>
+    <string name="routines_meta">%1$s · about %2$d min</string>
+    <string name="routines_minutes">%1$d min</string>
+
+    <string name="routines_preview_begins">Begins when you press Start</string>
+    <string name="routines_preview_last_screen">Last screen</string>
+    <string name="routines_preview_sound">Sound: %1$s</string>
+    <string name="routines_preview_sound_note">%1$s, soft note when nearly done</string>
+    <string name="routines_start">Start routine</string>
+    <string name="routines_edit">Edit</string>
+    <string name="routines_duplicate">Duplicate</string>
+    <string name="routines_back">Back to routines</string>
+
+    <string name="routines_editor_title_new">New routine</string>
+    <string name="routines_editor_title_edit">Edit routine</string>
+    <string name="routines_editor_name">Routine name</string>
+    <string name="routines_editor_name_hint">e.g. Morning</string>
+    <string name="routines_editor_activities">Activities</string>
+    <string name="routines_editor_no_activities">No activities yet.</string>
+    <string name="routines_editor_activity_name">Activity name</string>
+    <string name="routines_editor_phrase">We say: \"We are …\" (optional)</string>
+    <string name="routines_editor_phrase_hint">e.g. getting dressed</string>
+    <string name="routines_editor_starting">Starting this activity</string>
+    <string name="routines_editor_add">+ Add activity</string>
+    <string name="routines_editor_add_limit">You have reached the limit of activities: %1$d.</string>
+    <string name="routines_editor_add_room">Activities allowed: up to %1$d.</string>
+    <string name="routines_editor_last_screen">When the routine is finished</string>
+    <string name="routines_editor_sound">When time is up</string>
+    <string name="routines_editor_note">Soft note when nearly done</string>
+    <string name="routines_editor_save">Save</string>
+    <string name="routines_editor_cancel">Cancel</string>
+    <string name="routines_editor_delete">Delete routine</string>
+    <string name="routines_editor_delete_confirm">Tap again to delete for good</string>
+    <string name="routines_editor_save_failed">Could not save on this device. Nothing was lost; try again.</string>
+    <string name="routines_editor_cannot_save">This routine cannot be saved yet:</string>
+
+    <string name="routines_issue_blank_name">Give the routine a name.</string>
+    <string name="routines_issue_no_activities">Add at least one activity.</string>
+    <string name="routines_issue_too_many">There are too many activities.</string>
+    <string name="routines_issue_blank_activity">A name is missing (activity %1$d).</string>
+    <string name="routines_issue_minutes">Minutes must be 1 to 60 (activity %1$d).</string>
+
+    <string name="routines_fewer_minutes">Fewer minutes</string>
+    <string name="routines_more_minutes">More minutes</string>
+    <string name="routines_move_up">Move %1$s up</string>
+    <string name="routines_move_down">Move %1$s down</string>
+    <string name="routines_remove">Remove %1$s</string>
+    <string name="routines_unnamed">activity %1$d</string>
+
+    <string name="routines_policy_child_taps">Child taps</string>
+    <string name="routines_policy_unlock">Grown-up unlocks, child taps</string>
+    <string name="routines_policy_adult">Grown-up only</string>
+
+    <string name="routines_finish_all_done">All done! (check mark)</string>
+    <string name="routines_finish_sleep">Sleep time (fades to dark)</string>
+    <string name="routines_final_all_done">All done!</string>
+    <string name="routines_final_sleep">Sleep time</string>
+
+    <string name="routines_chime_gentle">Gentle chime</string>
+    <string name="routines_chime_repeat">Repeats every 20 s</string>
+    <string name="routines_chime_none">No sound</string>
+
+    <string name="routines_pic_cuddle">Cuddle</string>
+    <string name="routines_pic_toilet">Toilet</string>
+    <string name="routines_pic_teeth">Teeth</string>
+    <string name="routines_pic_dress">Get dressed</string>
+    <string name="routines_pic_hair">Hair</string>
+    <string name="routines_pic_leave">Leave the house</string>
+    <string name="routines_pic_play">Play</string>
+    <string name="routines_pic_tidy">Tidy up</string>
+    <string name="routines_pic_bath">Bath</string>
+    <string name="routines_pic_story">Story</string>
+    <string name="routines_pic_snack">Snack</string>
+    <string name="routines_pic_playground">Playground</string>
+    <string name="routines_pic_outside">Outside</string>
+    <string name="routines_pic_star">Other</string>
+    <string name="routines_pic_sleep">Sleep</string>
+    <string name="routines_pic_done">Done</string>
+
+    <string name="routines_colour_amber">Amber</string>
+    <string name="routines_colour_green">Green</string>
+    <string name="routines_colour_blue">Blue</string>
+    <string name="routines_colour_teal">Teal</string>
+    <string name="routines_colour_purple">Purple</string>
+    <string name="routines_colour_indigo">Indigo</string>
+    <string name="routines_colour_other">Other</string>
+</resources>

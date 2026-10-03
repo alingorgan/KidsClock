@@ -14,6 +14,10 @@
     <string name="sheet_say_active">We are %1$s. The big circle is getting smaller and the screen is %2$s. When it is red, we are out of time.</string>
     <string name="sheet_say_transition">It is red. We are out of time. Now it is %1$s.</string>
     <string name="sheet_say_final">The day is done. Time for sleep.</string>
+    <string name="sheet_say_active_no_phrase">Now it is %1$s. The big circle is getting smaller and the screen is %2$s. When it is red, we are out of time.</string>
+    <string name="sheet_say_all_done">That is all for now. Well done!</string>
+    <string name="sheet_ask_all_done">Ask: \"What was the best bit?\"</string>
+    <string name="sheet_back_to_routines">Back to routines</string>
     <string name="sheet_ask_active">Ask: \"Is the circle big or small now? What comes after this?\"</string>
     <string name="sheet_ask_transition">Ask: \"Can you show me what is next?\"</string>
     <string name="sheet_ask_final">Ask: \"What was your favourite part of today?\"</string>

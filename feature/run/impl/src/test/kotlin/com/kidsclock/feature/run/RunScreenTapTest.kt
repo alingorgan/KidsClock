@@ -39,7 +39,10 @@ class RunScreenTapTest {
     private fun show() {
         compose.setContent {
             KidsClockTheme(darkTheme = false) {
-                RunScreen(uiState = running, actions = RunActions({ taps++ }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}))
+                RunScreen(
+                    uiState = running,
+                    actions = RunActions({ taps++ }, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}),
+                )
             }
         }
     }

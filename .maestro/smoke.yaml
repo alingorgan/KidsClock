@@ -1,9 +1,20 @@
-# Smoke flow: the app launches and shows the run screen. Run with:
+# Smoke flow: the app opens on the routines list, a routine can be previewed and started, and the run
+# screen shows. Run with:
 #   maestro test .maestro/smoke.yaml
 # See docs/UI_AUTOMATION.md for setup and the id convention (`<screen>.<element>`).
 appId: com.kidsclock
 ---
 - launchApp
+- assertVisible:
+    id: "routines.library"
+- assertVisible:
+    id: "routines.library.new"
+- tapOn:
+    id: "routines.library.card.example-morning"
+- assertVisible:
+    id: "routines.preview.start"
+- tapOn:
+    id: "routines.preview.start"
 - assertVisible:
     id: "run.screen"
 - assertVisible:

@@ -15,10 +15,12 @@ class RunActions(
     val onSelectPreset: (QuickTimerPreset) -> Unit,
     val onSelectMinutes: (Int) -> Unit,
     val onStartElse: () -> Unit,
+    /** "Back to routines": leaves the run (decision 34; a run is not kept, decision 31). */
+    val onExit: () -> Unit,
 ) {
     companion object {
         /** For previews and snapshot tests. */
         val None =
-            RunActions({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+            RunActions({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
     }
 }

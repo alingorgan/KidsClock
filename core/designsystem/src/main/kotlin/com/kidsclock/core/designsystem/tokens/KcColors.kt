@@ -21,6 +21,8 @@ data class KcColors(
     /** The near-black the Sleep-time fade ends on, and the light text on it (decision 23). */
     val fadeStage: Color,
     val fadeInk: Color,
+    /** Error text on the grown-up's setup screens (always paired with words, never colour alone). */
+    val error: Color,
 )
 
 /** Fixed activity palette (SPEC §12). Same in light and dark. */
@@ -51,6 +53,7 @@ fun lightKcColors() =
         scrim = Color(0x66000000),
         fadeStage = Color(0xFF05070A),
         fadeInk = Color(0xFFE8EEF2),
+        error = Color(0xFFB3261E),
     )
 
 fun darkKcColors() =
@@ -65,4 +68,5 @@ fun darkKcColors() =
         scrim = Color(0x99000000),
         fadeStage = Color(0xFF05070A),
         fadeInk = Color(0xFFE8EEF2),
+        error = Color(0xFFF2988F),
     )

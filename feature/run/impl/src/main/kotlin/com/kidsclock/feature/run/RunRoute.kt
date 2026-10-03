@@ -1,5 +1,7 @@
 package com.kidsclock.feature.run
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +22,7 @@ fun RunRoute(
     viewModelFactory: RunViewModelFactory,
     onPlayChime: () -> Unit,
     onPlayNearlyDone: () -> Unit,
+    onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: RunViewModel = viewModel(factory = viewModelFactory)
@@ -42,6 +45,10 @@ fun RunRoute(
         }
     }
 
+    // The child's screen has no "back": a toddler's press-hold-swipe from the edge must not leave the run or the app.
+    // The grown-up leaves through the sheet's "Back to routines" instead (SPEC §9).
+    BackHandler(enabled = true) {}
+
     val actions =
         remember(viewModel) {
             RunActions(
@@ -56,7 +63,10 @@ fun RunRoute(
                 onSelectPreset = viewModel::onSelectPreset,
                 onSelectMinutes = viewModel::onSelectMinutes,
                 onStartElse = viewModel::onStartElse,
+                onExit = onExit,
             )
         }
-    RunScreen(uiState = uiState, actions = actions, modifier = modifier, hint = hint)
+    // Also asks the system not to start its own back swipe from the edges here (honoured for up to 200 dp
+    // of each edge, API 29+; the no-op handler above covers the rest).
+    RunScreen(uiState = uiState, actions = actions, modifier = modifier.systemGestureExclusion(), hint = hint)
 }
